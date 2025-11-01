@@ -5,7 +5,6 @@ export const INLINED_DEFAULT_PRESETS: {name: string, config: Partial<EpubGenerat
   {
     name: "Novel543.com (Example)",
     config: {
-      proxyUrl: "https://api.allorigins.win/raw?url=",
       tocUrl: "https://www.novel543.com/1218631547/dir",
       firstChapterUrl: "https://www.novel543.com/1218631547/8096_1.html",
       novelTitle: "幼崽讀心：全家除我都是穿越大佬 章節列表",
@@ -40,7 +39,6 @@ export const INLINED_DEFAULT_PRESETS: {name: string, config: Partial<EpubGenerat
   {
     name: "shuhaige.net (Example)",
     config: {
-      proxyUrl: "https://api.allorigins.win/raw?url=",
       tocUrl: "https://m.shuhaige.net/397861_1",
       firstChapterUrl: "https://m.shuhaige.net/397861/135960994.html",
       tocLinkSelector: "#read > div.main > ul.read > li > a",
@@ -57,6 +55,37 @@ export const INLINED_DEFAULT_PRESETS: {name: string, config: Partial<EpubGenerat
       nextPageLinkSelector: "div.pager > a:nth-of-type(3)",
       requestDelay: 600,
       concurrentDownloads: 1
+    }
+  },
+  {
+    name: "52shuku.net (Example)",
+    config: {
+      tocUrl: "https://www.52shuku.net/yanqing/pm/h5nx.html",
+      firstChapterUrl: "https://www.52shuku.net/yanqing/pm/h5nx_2.html",
+      novelTitle: "碰瓷翻了车_含胭【完结+番外】",
+      author: "含胭",
+      synopsis: "",
+      publisher: "",
+      genres: "",
+      tocLinkSelector: "article > ul > li > a",
+      paginatedToc: false,
+      tocNextPageSelector: "",
+      chapterContainerSelector: "#text",
+      chapterTitleSelector: "",
+      elementsToRemoveSelector: "script, style, iframe, nav, .nav, #nav, footer, .footer, #footer, .sidebar, #sidebar, .comments, #comments, .ad, .ads, #lineCorrect, button",
+      textToRemove: [],
+      coverImageUrl: "https://picsum.photos/600/800",
+      coverImageSelector: "",
+      novelTitleSelector: "h1.article-title",
+      authorSelector: "",
+      synopsisSelector: "",
+      nextPageLinkSelector: "",
+      requestDelay: 200,
+      concurrentDownloads: 1,
+      includeTitleInContent: true,
+      coverImageBase64: "",
+      maxRetries: 2,
+      retryDelay: 500
     }
   }
 ];

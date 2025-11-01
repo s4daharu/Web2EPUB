@@ -10,8 +10,9 @@
           </div>
         </div>
         <div class="flex items-center space-x-2">
-          <button (click)="toggleSideMenu()" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" title="Advanced Settings">
-              <app-icon-cog class="h-6 w-6"></app-icon-cog>
+          <button (click)="toggleSideMenu()" class="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors" title="Advanced Settings">
+              <app-icon-cog class="h-5 w-5"></app-icon-cog>
+              <span class="text-sm font-medium">Settings</span>
           </button>
           <button (click)="toggleDarkMode()" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" title="Toggle Dark Mode">
             @if (isDarkMode()) {
@@ -275,7 +276,7 @@
           <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Advanced Settings</h3>
           <button (click)="toggleSideMenu()" class="text-2xl font-light text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">&times;</button>
         </div>
-        <div class="overflow-y-auto p-4 space-y-1" [formGroup]="uiStateForm">
+        <div class="overflow-y-auto p-4 space-y-1" [formGroup]="configForm">
           
           <!-- Accordion Item: General -->
           <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
@@ -285,15 +286,8 @@
             </button>
             @if (activeAccordionSection() === 'general') {
               <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
-                  <div>
-                    <label for="proxyUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CORS Proxy</label>
-                    <select id="proxyUrl" formControlName="proxyUrl" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                      @for (proxy of proxies; track proxy.url) { <option [value]="proxy.url">{{ proxy.name }}</option> }
-                    </select>
-                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">A proxy is needed to bypass browser restrictions. "Headless" proxies are slower but can run JavaScript.</p>
-                  </div>
                   <div class="space-y-2 sm:space-y-0 sm:flex sm:space-x-2">
-                    <input type="text" formControlName="presetName" placeholder="New preset name..." class="flex-grow w-full sm:w-auto bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="text" [formControl]="$any(uiStateForm.get('presetName'))" placeholder="New preset name..." class="flex-grow w-full sm:w-auto bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                     <button (click)="savePreset()" 
                       [disabled]="savePresetSuccess()"
                       class="w-full sm:w-auto px-4 py-2 text-white text-sm font-medium rounded-md transition-colors"
@@ -310,7 +304,7 @@
                   </div>
                   @if(presets().length > 0) {
                     <div class="space-y-2 sm:space-y-0 sm:flex sm:space-x-2">
-                      <select formControlName="selectedPreset" class="flex-grow w-full sm:w-auto bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                      <select [formControl]="$any(uiStateForm.get('selectedPreset'))" class="flex-grow w-full sm:w-auto bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                         <option value="" disabled>Select a preset to load...</option>
                         @if(userPresets().length > 0) {
                           <optgroup label="My Presets">
@@ -500,7 +494,7 @@
                 <div>
                   <label for="textToRemove" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Exact Phrases to Remove</label>
                   <div class="flex space-x-2">
-                    <input id="textToRemove" type="text" formControlName="newTextToRemove" (keydown.enter)="addTextToRemove()" placeholder="Add a phrase to remove..." class="flex-grow bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                    <input id="textToRemove" type="text" [formControl]="$any(uiStateForm.get('newTextToRemove'))" (keydown.enter)="addTextToRemove()" placeholder="Add a phrase to remove..." class="flex-grow bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                     <button (click)="addTextToRemove()" class="px-4 py-2 bg-indigo-500 text-white text-sm font-medium rounded-md hover:bg-indigo-600 shrink-0">Add</button>
                   </div>
                   @if (textToRemoveControls.length > 0) {

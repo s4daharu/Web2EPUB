@@ -58,17 +58,9 @@ export class AppComponent {
   private http = inject(HttpClient);
   private fb = inject(FormBuilder);
   private generationSubscription: Subscription | null = null;
-
-  proxies = [
-    { name: 'CORSProxy.io', url: 'https://corsproxy.io/?' },
-    { name: 'AllOrigins', url: 'https://api.allorigins.win/raw?url=' },
-    { name: 'ThingProxy', url: 'https://thingproxy.freeboard.io/fetch/' },
-    { name: 'Render-tron (Headless)', url: 'https://render-tron.appspot.com/render/'},
-    { name: 'No Proxy (for CORS-enabled sites)', url: '' }
-  ];
   
   defaultConfig: EpubGenerationConfig = {
-    proxyUrl: this.proxies[1].url,
+    proxyUrl: 'https://api.allorigins.win/raw?url=',
     tocUrl: '',
     firstChapterUrl: '',
     novelTitle: 'My Awesome Novel',

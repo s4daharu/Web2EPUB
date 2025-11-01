@@ -760,6 +760,19 @@ export class AppComponent {
     this.isSideMenuVisible.update(v => !v);
   }
   
+  toggleProxy() {
+    const proxyControl = this.configForm.get('proxyUrl');
+    if (proxyControl) {
+      if (proxyControl.value) {
+        // It has a value, so disable it by clearing
+        proxyControl.setValue('');
+      } else {
+        // It's empty, so restore default
+        proxyControl.setValue(this.defaultConfig.proxyUrl);
+      }
+    }
+  }
+
   toggleDarkMode() {
     this.isDarkMode.update(value => !value);
   }

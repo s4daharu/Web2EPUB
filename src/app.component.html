@@ -549,6 +549,22 @@
             @if (activeAccordionSection() === 'performance') {
               <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
                 <div>
+                  <label for="proxyUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Proxy URL
+                  </label>
+                  <div class="flex items-center space-x-2">
+                    <input id="proxyUrl" type="text" formControlName="proxyUrl" class="flex-grow bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                    <button (click)="toggleProxy()" class="px-3 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md shrink-0">
+                      @if (configForm.get('proxyUrl')?.value) {
+                        <span>Disable</span>
+                      } @else {
+                        <span>Use Default</span>
+                      }
+                    </button>
+                  </div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Needed to bypass browser CORS security. Disabling the proxy will likely cause fetch errors for most websites. If fetching fails, try another, e.g., `https://corsproxy.io/?`.</p>
+                </div>
+                <div>
                   <label for="requestDelay" class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     <span>Request Delay</span>
                     <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().requestDelay }} ms</span>

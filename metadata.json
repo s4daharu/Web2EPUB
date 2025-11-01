@@ -1,5 +1,5 @@
 {
-  "name": "Web2EPUB Generator v6.8",
+  "name": "Web2EPUB Generator v6.9",
   "description": "A client-side tool that fetches chapters from a web novel's table of contents and compiles them into a downloadable EPUB file. It all happens directly in your browser.",
   "requestFramePermissions": []
 }

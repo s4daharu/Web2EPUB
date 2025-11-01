@@ -56,7 +56,8 @@ type AccordionSection = 'general' | 'dataSource' | 'metadata' | 'parsing' | 'cle
 export class AppComponent {
   private epubService = inject(EpubService);
   private http = inject(HttpClient);
-  private fb = inject(FormBuilder);
+  // FIX: Replaced `inject(FormBuilder)` with direct instantiation. `inject` was failing to resolve the type correctly, causing `this.fb` to be `unknown`.
+  private fb = new FormBuilder();
   private generationSubscription: Subscription | null = null;
   
   defaultConfig: EpubGenerationConfig = {

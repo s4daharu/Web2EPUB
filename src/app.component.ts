@@ -793,6 +793,14 @@ export class AppComponent {
     );
   }
 
+  reverseChapterOrder() {
+    this.processedChapters.update(chapters => {
+      const reversedChapters = [...chapters].reverse();
+      // Re-assign order based on new position
+      return reversedChapters.map((c, index) => ({ ...c, order: index + 1 }));
+    });
+  }
+
   toggleChapterSelection(chapterId: string) {
     this.processedChapters.update(chapters =>
       chapters.map(c => c.id === chapterId ? { ...c, selected: !c.selected } : c)

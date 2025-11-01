@@ -56,36 +56,5 @@ export const INLINED_DEFAULT_PRESETS: {name: string, config: Partial<EpubGenerat
       requestDelay: 600,
       concurrentDownloads: 1
     }
-  },
-  {
-    name: "52shuku.net (Example)",
-    config: {
-      tocUrl: "https://www.52shuku.net/yanqing/pm/h5nx.html",
-      firstChapterUrl: "https://www.52shuku.net/yanqing/pm/h5nx_2.html",
-      novelTitle: "碰瓷翻了车_含胭【完结+番外】",
-      author: "含胭",
-      synopsis: "",
-      publisher: "",
-      genres: "",
-      tocLinkSelector: "article > ul > li > a",
-      paginatedToc: false,
-      tocNextPageSelector: "",
-      chapterContainerSelector: "#text",
-      chapterTitleSelector: "",
-      elementsToRemoveSelector: "script, style, iframe, nav, .nav, #nav, footer, .footer, #footer, .sidebar, #sidebar, .comments, #comments, .ad, .ads, #lineCorrect, button",
-      textToRemove: [],
-      coverImageUrl: "https://picsum.photos/600/800",
-      coverImageSelector: "",
-      novelTitleSelector: "h1.article-title",
-      authorSelector: "",
-      synopsisSelector: "",
-      nextPageLinkSelector: "",
-      requestDelay: 200,
-      concurrentDownloads: 1,
-      includeTitleInContent: true,
-      coverImageBase64: "",
-      maxRetries: 2,
-      retryDelay: 500
-    }
   }
 ];

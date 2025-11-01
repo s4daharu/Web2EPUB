@@ -38,6 +38,7 @@ export interface EpubGenerationConfig {
   requestDelay: number;
   concurrentDownloads: number;
   includeTitleInContent: boolean;
+  includeTitleInTxt?: boolean;
   maxRetries: number;
   retryDelay: number;
 }
@@ -290,7 +291,7 @@ export class EpubService {
 
   buildTxt(chapters: Chapter[], config: EpubGenerationConfig): string {
     return chapters.map(ch => {
-        const title = config.includeTitleInContent ? `<h1>${ch.title}</h1>\n\n` : '';
+        const title = config.includeTitleInTxt !== false ? `${ch.title}\n\n` : '';
         // Basic HTML to text conversion
         const tempEl = document.createElement('div');
         tempEl.innerHTML = ch.content

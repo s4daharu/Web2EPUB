@@ -71,5 +71,20 @@ export const INLINED_DEFAULT_PRESETS: {name: string, config: Partial<EpubGenerat
       nextPageLinkSelector: "div.pagination2 > ul > a:nth-of-type(3)",
       concurrentDownloads: 1,
     }
+  },
+  {
+    name: "xbanxia.cc (Example)",
+    config: {
+      tocUrl: "https://www.xbanxia.cc/books/390961.html",
+      firstChapterUrl: "https://www.xbanxia.cc/books/390961/69068842.html",
+      tocLinkSelector: "#content-list > div.book-list.clearfix > ul > li > a",
+      chapterContainerSelector: "#nr1",
+      chapterTitleSelector: "#nr_title",
+      elementsToRemoveSelector: "script, style, iframe, nav, .nav, #nav, footer, .footer, #footer, .sidebar, #sidebar, .comments, #comments, .ad, .ads ,span",
+      coverImageSelector: "#content-list > div.book-intro.clearfix > div.book-img > img",
+      authorSelector: "#content-list > div.book-intro.clearfix > div.book-describe > p > a",
+      synopsisSelector: "#content-list > div.book-intro.clearfix > div.book-describe > div",
+      concurrentDownloads: 1
+    }
   }
 ];

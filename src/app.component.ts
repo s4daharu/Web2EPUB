@@ -103,6 +103,7 @@ export class AppComponent {
     requestTimeout: 30000,
     exponentialBackoff: true,
     enableChapterCache: true,
+    maxPagesPerChapter: 20,
   };
 
   configForm: FormGroup;
@@ -221,6 +222,7 @@ export class AppComponent {
       requestTimeout: [this.defaultConfig.requestTimeout],
       exponentialBackoff: [this.defaultConfig.exponentialBackoff],
       enableChapterCache: [this.defaultConfig.enableChapterCache],
+      maxPagesPerChapter: [this.defaultConfig.maxPagesPerChapter],
     });
 
     this.uiStateForm = this.fb.group({

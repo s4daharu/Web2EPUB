@@ -752,6 +752,18 @@
                   class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:border-gray-500">
               </div>
               <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Double delay after each failed retry attempt.</p>
+              <div class="mt-4">
+                <label for="maxPagesPerChapter"
+                  class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <span>Max Pages Per Chapter</span>
+                  <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().maxPagesPerChapter }}</span>
+                </label>
+                <input id="maxPagesPerChapter" type="range" min="1" max="100" step="1"
+                  formControlName="maxPagesPerChapter"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Maximum number of sub-pages to fetch for a
+                  single chapter.</p>
+              </div>
             </div>
             <div class="pt-2 border-t dark:border-gray-700 mt-4">
               <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Caching</h4>

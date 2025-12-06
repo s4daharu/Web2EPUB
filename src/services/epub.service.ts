@@ -45,6 +45,7 @@ export interface EpubGenerationConfig {
   requestTimeout?: number; // Timeout in ms (default: 30000)
   exponentialBackoff?: boolean; // Use exponential backoff for retries
   enableChapterCache?: boolean; // Cache chapters in localStorage
+  maxPagesPerChapter?: number; // Max pages to fetch per chapter (default: 20)
 }
 
 // Error types for better categorization
@@ -552,27 +553,66 @@ export class EpubService {
     const visitedUrls = new Set<string>();
     const allChapterUrlSet = new Set(allChapters.map(c => c.url));
 
+    let pageCount = 0;
+    const MAX_PAGES = config.maxPagesPerChapter || 20;
+
     const fetchPage = (pageUrl: string): Observable<{ doc: Document, nextUrl?: string }> => {
       if (visitedUrls.has(pageUrl)) {
         return of({ doc: new DOMParser().parseFromString('', 'text/html'), nextUrl: undefined }); // Break loop
       }
       visitedUrls.add(pageUrl);
+      pageCount++;
 
       return this.fetchHtml(config.proxyUrl, pageUrl).pipe(
         map(html => {
           const doc = new DOMParser().parseFromString(html, 'text/html');
+
+          if (pageCount >= MAX_PAGES) {
+            return { doc, nextUrl: undefined };
+          }
+
           let nextUrl: string | undefined;
+          let nextLinkEl: HTMLAnchorElement | null = null;
+
+          // 1. Try configured selector
           if (config.nextPageLinkSelector) {
-            const nextLinkEl = doc.querySelector(config.nextPageLinkSelector) as HTMLAnchorElement;
-            const hrefAttr = nextLinkEl?.getAttribute('href');
-            if (hrefAttr) {
+            nextLinkEl = doc.querySelector(config.nextPageLinkSelector) as HTMLAnchorElement;
+          }
+
+          // 2. Heuristic fallback if no selector or selector failed to find element
+          if (!nextLinkEl) {
+            // Heuristics: rel="next", specific classes, or text content "Next" / "Next Page" / ">>"
+            nextLinkEl = doc.querySelector('a[rel="next"], a.next-page, a.next, a.nav-next') as HTMLAnchorElement;
+
+            if (!nextLinkEl) {
+              // Text-based search for common "Next" patterns (be careful not to match "Next Chapter")
+              const allLinks = Array.from(doc.querySelectorAll('a'));
+              // Filter for links that likely mean "next page" and NOT "next chapter"
+              nextLinkEl = allLinks.find(a => {
+                const text = (a.textContent || '').trim().toLowerCase();
+                const isNext = /next page|next\s*(\d+|»)|下一页/i.test(text) || (text === 'next' || text === '»' || text === '>');
+                // Exclude if it explicitly says "chapter" unless we are very sure? 
+                // Usually "Next Chapter" means we explicitly stop.
+                const isChapter = /chapter/.test(text);
+                return isNext && !isChapter;
+              }) as HTMLAnchorElement || null;
+            }
+          }
+
+          const hrefAttr = nextLinkEl?.getAttribute('href');
+          if (hrefAttr) {
+            try {
               const resolvedUrl = new URL(hrefAttr, pageUrl).href;
-              // Stop if the next link is another chapter from the TOC (and not the current one)
+
+              // Stop if the next link is another chapter from the TOC
               if (allChapterUrlSet.has(resolvedUrl) && resolvedUrl !== url) {
                 nextUrl = undefined;
               } else if (!visitedUrls.has(resolvedUrl)) {
+                // Ensure we stay on the same domain/novel structure ideally, but URL check is safer
                 nextUrl = resolvedUrl;
               }
+            } catch (e) {
+              console.warn('Invalid next page URL:', hrefAttr);
             }
           }
           return { doc, nextUrl };

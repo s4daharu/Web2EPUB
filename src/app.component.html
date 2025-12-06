@@ -726,12 +726,48 @@
               <div class="mt-4">
                 <label for="retryDelay"
                   class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  <span>Retry Delay</span>
+                  <span>Retry Delay (base)</span>
                   <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().retryDelay }} ms</span>
                 </label>
-                <input id="retryDelay" type="range" min="100" max="5000" step="100" formControlName="retryDelay"
+                <input id="retryDelay" type="range" min="500" max="5000" step="500" formControlName="retryDelay"
                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
               </div>
+              <div class="mt-4">
+                <label for="requestTimeout"
+                  class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <span>Request Timeout</span>
+                  <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ (config().requestTimeout || 30000) /
+                    1000 }}s</span>
+                </label>
+                <input id="requestTimeout" type="range" min="10000" max="120000" step="5000"
+                  formControlName="requestTimeout"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Time to wait before a request times out.</p>
+              </div>
+              <div class="mt-4 flex items-center justify-between">
+                <label for="exponentialBackoff" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Exponential Backoff
+                </label>
+                <input id="exponentialBackoff" type="checkbox" formControlName="exponentialBackoff"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:border-gray-500">
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Double delay after each failed retry attempt.</p>
+            </div>
+            <div class="pt-2 border-t dark:border-gray-700 mt-4">
+              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Caching</h4>
+              <div class="flex items-center justify-between">
+                <label for="enableChapterCache" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Cache Downloaded Chapters
+                </label>
+                <input id="enableChapterCache" type="checkbox" formControlName="enableChapterCache"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:border-gray-500">
+              </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Store chapters locally to resume interrupted
+                downloads (24h expiry).</p>
+              <button type="button" (click)="clearChapterCache()"
+                class="mt-2 text-xs text-red-600 dark:text-red-400 hover:underline">
+                Clear Chapter Cache
+              </button>
             </div>
           </div>
           }

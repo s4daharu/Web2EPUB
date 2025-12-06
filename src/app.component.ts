@@ -64,6 +64,10 @@ export class AppComponent {
 
   defaultConfig: EpubGenerationConfig = {
     proxyUrl: 'https://api.allorigins.win/raw?url=',
+    fallbackProxies: [
+      'https://corsproxy.io/?url=',
+      'https://api.codetabs.com/v1/proxy?quest='
+    ],
     tocUrl: '',
     firstChapterUrl: '',
     novelTitle: 'My Awesome Novel',
@@ -94,8 +98,11 @@ export class AppComponent {
     includeTitleInContent: true,
     includeTitleInTxt: true,
     coverImageBase64: '',
-    maxRetries: 2,
-    retryDelay: 500,
+    maxRetries: 3,
+    retryDelay: 1000,
+    requestTimeout: 30000,
+    exponentialBackoff: true,
+    enableChapterCache: true,
   };
 
   configForm: FormGroup;
@@ -211,6 +218,9 @@ export class AppComponent {
       coverImageBase64: [this.defaultConfig.coverImageBase64],
       maxRetries: [this.defaultConfig.maxRetries],
       retryDelay: [this.defaultConfig.retryDelay],
+      requestTimeout: [this.defaultConfig.requestTimeout],
+      exponentialBackoff: [this.defaultConfig.exponentialBackoff],
+      enableChapterCache: [this.defaultConfig.enableChapterCache],
     });
 
     this.uiStateForm = this.fb.group({
@@ -875,5 +885,12 @@ export class AppComponent {
     this.appStep.set('chapters');
     this.error.set(null);
     this.progress.set({ message: '', percentage: 0 });
+  }
+
+  clearChapterCache() {
+    if (confirm('Are you sure you want to clear the chapter cache? This will remove all downloaded chapter content stored in your browser.')) {
+      this.epubService.clearChapterCache();
+      alert('Chapter cache cleared!');
+    }
   }
 }

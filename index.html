@@ -1,28 +1,46 @@
 <!DOCTYPE html>
 <html lang="en" class="">
+
 <head>
   <meta charset="utf-8" />
   <title>Web Novel EPUB Generator</title>
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="A client-side tool that fetches chapters from a web novel's table of contents and compiles them into a downloadable EPUB file. It all happens directly in your browser." />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description"
+    content="A client-side tool that fetches chapters from a web novel's table of contents and compiles them into a downloadable EPUB file. It all happens directly in your browser." />
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#6366f1" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#1e293b" media="(prefers-color-scheme: dark)" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Web2EPUB" />
 
   <!-- Social Media Preview Meta Tags for sharing -->
   <meta property="og:title" content="Web Novel EPUB Generator" />
-  <meta property="og:description" content="A powerful client-side tool to convert web novel chapters into a downloadable EPUB file, right in your browser." />
+  <meta property="og:description"
+    content="A powerful client-side tool to convert web novel chapters into a downloadable EPUB file, right in your browser." />
   <meta property="og:image" content="https://picsum.photos/id/24/1200/630" />
   <meta property="og:type" content="website" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Web Novel EPUB Generator" />
-  <meta name="twitter:description" content="A powerful client-side tool to convert web novel chapters into a downloadable EPUB file, right in your browser." />
+  <meta name="twitter:description"
+    content="A powerful client-side tool to convert web novel chapters into a downloadable EPUB file, right in your browser." />
   <meta name="twitter:image" content="https://picsum.photos/id/24/1200/630" />
 
+  <!-- Icons -->
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
-<script type="importmap">
+  <script type="importmap">
 {
   "imports": {
     "rxjs": "https://esm.sh/rxjs@^7.8.2",
@@ -41,9 +59,27 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<body
+  class="bg-gray-100 dark:bg-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 safe-area-inset-top safe-area-inset-bottom">
   <app-root></app-root>
+
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('ServiceWorker registered:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('ServiceWorker registration failed:', error);
+          });
+      });
+    }
+  </script>
 </body>
+
 </html>

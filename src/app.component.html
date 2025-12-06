@@ -1,24 +1,31 @@
-<main class="container mx-auto p-4 sm:p-6 md:p-8 font-sans" [formGroup]="configForm">
-  <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-indigo-500/10 overflow-hidden border border-gray-200 dark:border-gray-700">
-    <div class="p-6 sm:p-8 border-b border-gray-200 dark:border-gray-700">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <app-icon-book class="h-10 w-10 text-indigo-500"></app-icon-book>
-          <div>
-            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50">Web Novel EPUB Generator</h1>
-            <p class="text-gray-500 dark:text-gray-400 mt-1">Convert web novels into EPUBs, right in your browser.</p>
+<main class="container mx-auto p-3 sm:p-6 md:p-8 font-sans" [formGroup]="configForm">
+  <div
+    class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-indigo-500/10 overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div class="p-4 sm:p-6 md:p-8 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center space-x-3 sm:space-x-4">
+          <app-icon-book class="h-8 w-8 sm:h-10 sm:w-10 text-indigo-500 shrink-0"></app-icon-book>
+          <div class="min-w-0">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-50 truncate">Web Novel
+              EPUB Generator</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5 hidden sm:block">Convert web novels into EPUBs,
+              right in your browser.</p>
           </div>
         </div>
-        <div class="flex items-center space-x-2">
-          <button (click)="toggleSideMenu()" class="flex items-center space-x-2 px-3 py-2 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors" title="Advanced Settings">
-              <app-icon-cog class="h-5 w-5"></app-icon-cog>
-              <span class="text-sm font-medium">Settings</span>
+        <div class="flex items-center justify-end space-x-2 shrink-0">
+          <button (click)="toggleSideMenu()"
+            class="flex items-center space-x-2 px-3 py-2.5 rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors touch-target"
+            title="Advanced Settings">
+            <app-icon-cog class="h-5 w-5"></app-icon-cog>
+            <span class="text-sm font-medium">Settings</span>
           </button>
-          <button (click)="toggleDarkMode()" class="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" title="Toggle Dark Mode">
+          <button (click)="toggleDarkMode()"
+            class="p-2.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 touch-target"
+            title="Toggle Dark Mode">
             @if (isDarkMode()) {
-              <app-icon-sun class="h-6 w-6"></app-icon-sun>
+            <app-icon-sun class="h-6 w-6"></app-icon-sun>
             } @else {
-              <app-icon-moon class="h-6 w-6"></app-icon-moon>
+            <app-icon-moon class="h-6 w-6"></app-icon-moon>
             }
           </button>
         </div>
@@ -27,619 +34,749 @@
 
     <!-- STEP 1: CONFIGURATION -->
     @if (appStep() === 'config') {
-      <app-config-step
-        [configForm]="configForm"
-        [defaultPresets]="defaultPresets()"
-        [isDetecting]="isDetecting()"
-        [detectionStatus]="detectionStatus()"
-        [isLoading]="isLoading()"
-        [error]="error()"
-        (loadDefaultPreset)="loadDefaultPreset($event)"
-        (autoDetectSelectors)="autoDetectSelectors()"
-        (fetchDetails)="fetchDetails()">
-      </app-config-step>
+    <app-config-step [configForm]="configForm" [defaultPresets]="defaultPresets()" [isDetecting]="isDetecting()"
+      [detectionStatus]="detectionStatus()" [isLoading]="isLoading()" [error]="error()"
+      (loadDefaultPreset)="loadDefaultPreset($event)" (autoDetectSelectors)="autoDetectSelectors()"
+      (fetchDetails)="fetchDetails()">
+    </app-config-step>
     }
 
     <!-- STEP 2: DETAILS & COVER -->
     @if (appStep() === 'details') {
-      <div class="p-6 sm:p-8 space-y-6 animate-fade-in">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Novel Details</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="md:col-span-1 space-y-2">
-             @if (coverImagePreview()) {
-                <img [src]="coverImagePreview()" alt="Cover Preview" class="w-full h-auto object-cover rounded-lg shadow-md aspect-[3/4]">
-             } @else if (config().coverImageUrl) {
-                <img [src]="config().proxyUrl + config().coverImageUrl" alt="Cover" class="w-full h-auto object-cover rounded-lg shadow-md aspect-[3/4]">
-             }
-             @if (coverImagePreview() || config().coverImageUrl !== defaultConfig.coverImageUrl) {
-                <button (click)="clearCoverImage()" class="w-full text-xs text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400">Clear Image</button>
-             }
+    <div class="p-6 sm:p-8 space-y-6 animate-fade-in">
+      <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Novel Details</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-1 space-y-2">
+          @if (coverImagePreview()) {
+          <img [src]="coverImagePreview()" alt="Cover Preview"
+            class="w-full h-auto object-cover rounded-lg shadow-md aspect-[3/4]">
+          } @else if (config().coverImageUrl) {
+          <img [src]="config().proxyUrl + config().coverImageUrl" alt="Cover"
+            class="w-full h-auto object-cover rounded-lg shadow-md aspect-[3/4]">
+          }
+          @if (coverImagePreview() || config().coverImageUrl !== defaultConfig.coverImageUrl) {
+          <button (click)="clearCoverImage()"
+            class="w-full text-xs text-red-600 hover:text-red-800 dark:text-red-500 dark:hover:text-red-400">Clear
+            Image</button>
+          }
+        </div>
+        <div class="md:col-span-2 space-y-4">
+          <div>
+            <label for="novelTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+            <input id="novelTitle" type="text" formControlName="novelTitle"
+              class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
           </div>
-          <div class="md:col-span-2 space-y-4">
-             <div>
-              <label for="novelTitle" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
-              <input id="novelTitle" type="text" formControlName="novelTitle" class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-            <div>
-              <label for="author" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Author</label>
-              <input id="author" type="text" formControlName="author" class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-             <div>
-              <label for="synopsis" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Synopsis</label>
-              <textarea id="synopsis" rows="4" formControlName="synopsis" class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-            </div>
-            <div>
-              <label for="coverImageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cover Image URL</label>
-              <input id="coverImageUrl" type="text" formControlName="coverImageUrl" class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
-             <div>
-              <label for="coverImageFile" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Or Upload Cover Image</label>
-              <input id="coverImageFile" type="file" (change)="onCoverFileSelected($event)" accept="image/png, image/jpeg, image/webp" class="mt-1 w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-900/40 file:text-indigo-600 dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/60">
-            </div>
+          <div>
+            <label for="author" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Author</label>
+            <input id="author" type="text" formControlName="author"
+              class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div>
+            <label for="synopsis" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Synopsis</label>
+            <textarea id="synopsis" rows="4" formControlName="synopsis"
+              class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+          </div>
+          <div>
+            <label for="coverImageUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cover Image
+              URL</label>
+            <input id="coverImageUrl" type="text" formControlName="coverImageUrl"
+              class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div>
+            <label for="coverImageFile" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Or Upload
+              Cover Image</label>
+            <input id="coverImageFile" type="file" (change)="onCoverFileSelected($event)"
+              accept="image/png, image/jpeg, image/webp"
+              class="mt-1 w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 dark:file:bg-indigo-900/40 file:text-indigo-600 dark:file:text-indigo-300 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/60">
           </div>
         </div>
       </div>
-       <div class="p-6 bg-gray-50 dark:bg-slate-800 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-        <button (click)="goBackToConfig()" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-50 font-bold py-3 px-4 rounded-lg transition-colors">Back</button>
-        <button (click)="goToChapters()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Select Chapters &raquo;</button>
-      </div>
+    </div>
+    <div class="p-6 bg-gray-50 dark:bg-slate-800 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+      <button (click)="goBackToConfig()"
+        class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-50 font-bold py-3 px-4 rounded-lg transition-colors">Back</button>
+      <button (click)="goToChapters()"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Select
+        Chapters &raquo;</button>
+    </div>
     }
 
     <!-- STEP 3: CHAPTER SELECTION -->
     @if (appStep() === 'chapters') {
-       <div class="p-6 sm:p-8 animate-fade-in">
-          <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Select Chapters ({{ selectedChaptersCount() }} / {{ processedChapters().length }})</h2>
-          
-          <div class="space-y-4" [formGroup]="uiStateForm">
-            <div class="flex flex-col sm:flex-row gap-2 p-2 bg-gray-100 dark:bg-gray-900/50 rounded-lg">
-              <div class="relative flex-grow">
-                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <app-icon-search class="h-5 w-5 text-gray-400"></app-icon-search>
-                </div>
-                <input type="text" formControlName="chapterFilter" placeholder="Filter chapters..." class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md pl-10 pr-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-              </div>
-              <div class="flex-shrink-0 flex items-center gap-2">
-                  <button (click)="toggleAllChapters(true)" class="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600" title="Select All">All</button>
-                  <button (click)="toggleAllChapters(false)" class="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600" title="Deselect All">None</button>
-                  <button (click)="invertSelection()" class="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600" title="Invert Selection">Invert</button>
-                  <button (click)="reverseChapterOrder()" class="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600" title="Reverse Chapter Order">Reverse</button>
-                  <button (click)="isRangeSelectorVisible.set(true)" class="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600" title="Select Range">Range</button>
-                   <button (click)="isTitleTransformVisible.set(true)" class="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600" title="Transform Titles">Tools</button>
-              </div>
-            </div>
-          </div>
-          
-          <div class="mt-4 max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50/50 dark:bg-gray-900/20 space-y-1">
-            @for (chapter of filteredChapters(); track chapter.id) {
-              <div class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/60 cursor-move"
-                draggable="true" 
-                (dragstart)="onDragStart($event, chapter.id)"
-                (dragover)="onDragOver($event)"
-                (drop)="onDrop($event, chapter.id)"
-                (dragend)="onDragEnd()"
-                [class.opacity-40]="draggedChapterId() === chapter.id">
-                <div class="flex items-center space-x-3 flex-1 min-w-0">
-                   <!-- Drag Handle -->
-                  <app-icon-drag-handle class="h-5 w-5 text-gray-400 dark:text-gray-500 shrink-0"></app-icon-drag-handle>
-                  <input type="checkbox" [id]="'chap-' + chapter.id" [checked]="chapter.selected" (change)="toggleChapterSelection(chapter.id)" class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:ring-offset-gray-800">
-                  <label [for]="'chap-' + chapter.id" class="text-sm text-gray-800 dark:text-gray-200 truncate cursor-pointer" title="{{ chapter.title }}">{{ chapter.title }}</label>
-                </div>
-                <button (click)="previewChapter(chapter.id)" class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium ml-2 shrink-0">Preview</button>
-              </div>
-            }
-          </div>
-       </div>
+    <div class="p-6 sm:p-8 animate-fade-in">
+      <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">Select Chapters ({{ selectedChaptersCount() }}
+        / {{ processedChapters().length }})</h2>
 
-      <!-- MODAL: Range Selector -->
-      @if(isRangeSelectorVisible()) {
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in-fast">
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4 flex flex-col" [formGroup]="uiStateForm">
-             <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Select Chapter Range</h3>
-                <button (click)="isRangeSelectorVisible.set(false)" class="text-2xl font-light text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">&times;</button>
-             </div>
-             <div class="p-6 space-y-4">
-               <select formControlName="rangeStartChapterId" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                  <option value="" disabled>Select start chapter</option>
-                  @for(c of processedChapters(); track c.id) { <option [value]="c.id">{{ c.title }}</option> }
-                </select>
-                <select formControlName="rangeEndChapterId" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                  <option value="" disabled>Select end chapter</option>
-                  @for(c of processedChapters(); track c.id) { <option [value]="c.id">{{ c.title }}</option> }
-                </select>
-             </div>
-             <div class="p-4 bg-gray-50 dark:bg-slate-800 border-t dark:border-gray-700 text-right">
-                <button (click)="selectChapterRange()" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">Apply Range</button>
+      <div class="space-y-4" [formGroup]="uiStateForm">
+        <div class="flex flex-col gap-2 p-2 bg-gray-100 dark:bg-gray-900/50 rounded-lg">
+          <div class="relative">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <app-icon-search class="h-5 w-5 text-gray-400"></app-icon-search>
             </div>
+            <input type="text" formControlName="chapterFilter" placeholder="Filter chapters..."
+              class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md pl-10 pr-3 py-2.5 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <!-- Horizontally scrollable toolbar for mobile -->
+          <div class="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1 -mb-1">
+            <button (click)="toggleAllChapters(true)"
+              class="px-3 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 whitespace-nowrap shrink-0 touch-target"
+              title="Select All">All</button>
+            <button (click)="toggleAllChapters(false)"
+              class="px-3 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 whitespace-nowrap shrink-0 touch-target"
+              title="Deselect All">None</button>
+            <button (click)="invertSelection()"
+              class="px-3 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 whitespace-nowrap shrink-0 touch-target"
+              title="Invert Selection">Invert</button>
+            <button (click)="reverseChapterOrder()"
+              class="px-3 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 whitespace-nowrap shrink-0 touch-target"
+              title="Reverse Chapter Order">Reverse</button>
+            <button (click)="isRangeSelectorVisible.set(true)"
+              class="px-3 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 whitespace-nowrap shrink-0 touch-target"
+              title="Select Range">Range</button>
+            <button (click)="isTitleTransformVisible.set(true)"
+              class="px-3 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 whitespace-nowrap shrink-0 touch-target"
+              title="Transform Titles">Tools</button>
           </div>
         </div>
-      }
-
-       <!-- MODAL: Title Transform -->
-      @if(isTitleTransformVisible()) {
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in-fast">
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4 flex flex-col" [formGroup]="uiStateForm">
-             <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Transform Chapter Titles</h3>
-                <button (click)="isTitleTransformVisible.set(false)" class="text-2xl font-light text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">&times;</button>
-             </div>
-             <div class="p-6 space-y-4">
-                <p class="text-sm text-gray-600 dark:text-gray-400">Use this tool to find and replace text in all chapter titles. Supports regular expressions.</p>
-                 <div>
-                    <label for="findText" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Find Text</label>
-                    <input id="findText" type="text" formControlName="findText" placeholder="e.g., Chapter (\d+)" class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <label for="replaceText" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Replace With</label>
-                    <input id="replaceText" type="text" formControlName="replaceText" placeholder="e.g., Ch. $1" class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-             </div>
-             <div class="p-4 bg-gray-50 dark:bg-slate-800 border-t dark:border-gray-700 text-right">
-                <button (click)="applyTitleTransform()" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">Apply Transform</button>
-            </div>
-          </div>
-        </div>
-      }
-
-       <div class="p-6 bg-gray-50 dark:bg-slate-800 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-        <button (click)="goBackToDetails()" class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-50 font-bold py-3 px-4 rounded-lg transition-colors">Back</button>
-        <button (click)="startOrRetryGeneration(false)" [disabled]="selectedChaptersCount() === 0" class="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold py-3 px-4 rounded-lg transition-colors">Generate EPUB</button>
       </div>
+
+      <div
+        class="mt-4 max-h-96 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50/50 dark:bg-gray-900/20 space-y-1">
+        @for (chapter of filteredChapters(); track chapter.id) {
+        <div
+          class="flex items-center justify-between p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700/60 cursor-move"
+          draggable="true" (dragstart)="onDragStart($event, chapter.id)" (dragover)="onDragOver($event)"
+          (drop)="onDrop($event, chapter.id)" (dragend)="onDragEnd()"
+          [class.opacity-40]="draggedChapterId() === chapter.id">
+          <div class="flex items-center space-x-3 flex-1 min-w-0">
+            <!-- Drag Handle -->
+            <app-icon-drag-handle class="h-5 w-5 text-gray-400 dark:text-gray-500 shrink-0"></app-icon-drag-handle>
+            <input type="checkbox" [id]="'chap-' + chapter.id" [checked]="chapter.selected"
+              (change)="toggleChapterSelection(chapter.id)"
+              class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:ring-offset-gray-800">
+            <label [for]="'chap-' + chapter.id" class="text-sm text-gray-800 dark:text-gray-200 truncate cursor-pointer"
+              title="{{ chapter.title }}">{{ chapter.title }}</label>
+          </div>
+          <button (click)="previewChapter(chapter.id)"
+            class="text-sm text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium ml-2 shrink-0">Preview</button>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- MODAL: Range Selector -->
+    @if(isRangeSelectorVisible()) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in-fast">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4 flex flex-col"
+        [formGroup]="uiStateForm">
+        <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Select Chapter Range</h3>
+          <button (click)="isRangeSelectorVisible.set(false)"
+            class="text-2xl font-light text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">&times;</button>
+        </div>
+        <div class="p-6 space-y-4">
+          <select formControlName="rangeStartChapterId"
+            class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="" disabled>Select start chapter</option>
+            @for(c of processedChapters(); track c.id) { <option [value]="c.id">{{ c.title }}</option> }
+          </select>
+          <select formControlName="rangeEndChapterId"
+            class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="" disabled>Select end chapter</option>
+            @for(c of processedChapters(); track c.id) { <option [value]="c.id">{{ c.title }}</option> }
+          </select>
+        </div>
+        <div class="p-4 bg-gray-50 dark:bg-slate-800 border-t dark:border-gray-700 text-right">
+          <button (click)="selectChapterRange()"
+            class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">Apply
+            Range</button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- MODAL: Title Transform -->
+    @if(isTitleTransformVisible()) {
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in-fast">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-lg m-4 flex flex-col"
+        [formGroup]="uiStateForm">
+        <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Transform Chapter Titles</h3>
+          <button (click)="isTitleTransformVisible.set(false)"
+            class="text-2xl font-light text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">&times;</button>
+        </div>
+        <div class="p-6 space-y-4">
+          <p class="text-sm text-gray-600 dark:text-gray-400">Use this tool to find and replace text in all chapter
+            titles. Supports regular expressions.</p>
+          <div>
+            <label for="findText" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Find Text</label>
+            <input id="findText" type="text" formControlName="findText" placeholder="e.g., Chapter (\d+)"
+              class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div>
+            <label for="replaceText" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Replace
+              With</label>
+            <input id="replaceText" type="text" formControlName="replaceText" placeholder="e.g., Ch. $1"
+              class="mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+        </div>
+        <div class="p-4 bg-gray-50 dark:bg-slate-800 border-t dark:border-gray-700 text-right">
+          <button (click)="applyTitleTransform()"
+            class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700">Apply
+            Transform</button>
+        </div>
+      </div>
+    </div>
+    }
+
+    <div class="p-6 bg-gray-50 dark:bg-slate-800 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+      <button (click)="goBackToDetails()"
+        class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-50 font-bold py-3 px-4 rounded-lg transition-colors">Back</button>
+      <button (click)="startOrRetryGeneration(false)" [disabled]="selectedChaptersCount() === 0"
+        class="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold py-3 px-4 rounded-lg transition-colors">Generate
+        EPUB</button>
+    </div>
     }
 
     <!-- STEP 4: GENERATING -->
     @if (appStep() === 'generating') {
-      <div class="p-6 sm:p-8 space-y-4 animate-fade-in">
-        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Generating EPUB...</h2>
-        <p class="text-gray-600 dark:text-gray-300">{{ progress().message }}</p>
-        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-          <div class="bg-indigo-600 h-2.5 rounded-full" [style.width.%]="progress().percentage"></div>
-        </div>
-        <div class="text-sm text-gray-500 dark:text-gray-400">
-          <span>Status: {{ successfulChaptersCount() }} Succeeded, {{ failedChaptersCount() }} Failed of {{ selectedChaptersCount() }} selected.</span>
-        </div>
-        <div class="max-h-80 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50/50 dark:bg-gray-900/20 space-y-1">
-          @for (chapter of processedChapters(); track chapter.id) {
-            @if(chapter.selected) {
-              <div class="flex items-center justify-between p-2 rounded-md">
-                <span class="text-sm text-gray-700 dark:text-gray-300 truncate flex-1" title="{{ chapter.title }}">{{ chapter.title }}</span>
-                @switch (chapter.status) {
-                  @case ('pending') { <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Queued</span> }
-                  @case ('downloading') { 
-                    <div class="flex items-center space-x-1">
-                      <app-icon-spinner class="h-4 w-4 text-indigo-500"></app-icon-spinner>
-                      <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400">Processing...</span> 
-                    </div>
-                  }
-                  @case ('success') { <span class="text-xs font-medium text-green-600 dark:text-green-500">Success</span> }
-                  @case ('error') { <span class="text-xs font-medium text-red-600 dark:text-red-500" [title]="chapter.error">Failed</span> }
-                }
-              </div>
-            }
+    <div class="p-6 sm:p-8 space-y-4 animate-fade-in">
+      <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Generating EPUB...</h2>
+      <p class="text-gray-600 dark:text-gray-300">{{ progress().message }}</p>
+      <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+        <div class="bg-indigo-600 h-2.5 rounded-full" [style.width.%]="progress().percentage"></div>
+      </div>
+      <div class="text-sm text-gray-500 dark:text-gray-400">
+        <span>Status: {{ successfulChaptersCount() }} Succeeded, {{ failedChaptersCount() }} Failed of {{
+          selectedChaptersCount() }} selected.</span>
+      </div>
+      <div
+        class="max-h-80 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-2 bg-gray-50/50 dark:bg-gray-900/20 space-y-1">
+        @for (chapter of processedChapters(); track chapter.id) {
+        @if(chapter.selected) {
+        <div class="flex items-center justify-between p-2 rounded-md">
+          <span class="text-sm text-gray-700 dark:text-gray-300 truncate flex-1" title="{{ chapter.title }}">{{
+            chapter.title }}</span>
+          @switch (chapter.status) {
+          @case ('pending') { <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Queued</span> }
+          @case ('downloading') {
+          <div class="flex items-center space-x-1">
+            <app-icon-spinner class="h-4 w-4 text-indigo-500"></app-icon-spinner>
+            <span class="text-xs font-medium text-indigo-600 dark:text-indigo-400">Processing...</span>
+          </div>
+          }
+          @case ('success') { <span class="text-xs font-medium text-green-600 dark:text-green-500">Success</span> }
+          @case ('error') { <span class="text-xs font-medium text-red-600 dark:text-red-500"
+            [title]="chapter.error">Failed</span> }
           }
         </div>
+        }
+        }
       </div>
-      <div class="p-6 bg-gray-50 dark:bg-slate-800 border-t border-gray-200 dark:border-gray-700 text-center">
-        <button (click)="cancelGeneration()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Cancel Generation</button>
-      </div>
+    </div>
+    <div class="p-6 bg-gray-50 dark:bg-slate-800 border-t border-gray-200 dark:border-gray-700 text-center">
+      <button (click)="cancelGeneration()"
+        class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-colors">Cancel
+        Generation</button>
+    </div>
     }
 
     <!-- STEP 5: FINISHED -->
     @if (appStep() === 'finished') {
-       <div class="p-6 sm:p-8 space-y-4 text-center animate-fade-in">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Generation Complete!</h2>
-        <p class="text-gray-600 dark:text-gray-300">Successfully processed {{ successfulChaptersCount() }} out of {{ selectedChaptersCount() }} selected chapters.</p>
-        @if (failedChaptersCount() > 0) {
-          <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md text-left">
-            <p><span class="font-bold">{{ failedChaptersCount() }} chapters failed</span> to download. You can try to re-download only the failed chapters.</p>
-          </div>
-        }
-        @if (error()) {
-          <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md animate-fade-in" role="alert">
-            <p class="font-bold">An error occurred</p>
-            <p>{{ error() }}</p>
-          </div>
-        }
-       </div>
-       <div class="p-6 bg-gray-50 dark:bg-slate-800 border-t border-gray-200 dark:border-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <button (click)="goBackToChapters()" class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-50 font-bold py-3 px-4 rounded-lg transition-colors">Back to Chapters</button>
-          
-          @if (failedChaptersCount() > 0) {
-            <button (click)="startOrRetryGeneration(true)" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">Retry Failed Chapters</button>
-          }
-          
-          <button (click)="downloadEpub()" [disabled]="isLoading() || successfulChaptersCount() === 0" class="w-full sm:col-span-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
-            @if(isLoading()){
-               <app-icon-spinner class="h-5 w-5 text-white"></app-icon-spinner>
-               <span>Building...</span>
-            } @else {
-              <span>Download EPUB ({{ successfulChaptersCount() }} chapters)</span>
-            }
-          </button>
+    <div class="p-6 sm:p-8 space-y-4 text-center animate-fade-in">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Generation Complete!</h2>
+      <p class="text-gray-600 dark:text-gray-300">Successfully processed {{ successfulChaptersCount() }} out of {{
+        selectedChaptersCount() }} selected chapters.</p>
+      @if (failedChaptersCount() > 0) {
+      <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md text-left">
+        <p><span class="font-bold">{{ failedChaptersCount() }} chapters failed</span> to download. You can try to
+          re-download only the failed chapters.</p>
+      </div>
+      }
+      @if (error()) {
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md animate-fade-in" role="alert">
+        <p class="font-bold">An error occurred</p>
+        <p>{{ error() }}</p>
+      </div>
+      }
+    </div>
+    <div
+      class="p-6 bg-gray-50 dark:bg-slate-800 border-t border-gray-200 dark:border-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <button (click)="goBackToChapters()"
+        class="w-full bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-50 font-bold py-3 px-4 rounded-lg transition-colors">Back
+        to Chapters</button>
 
-           <button (click)="downloadTxt()" [disabled]="successfulChaptersCount() === 0" class="w-full sm:col-span-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
-              <span>Download TXT</span>
-            </button>
-       </div>
+      @if (failedChaptersCount() > 0) {
+      <button (click)="startOrRetryGeneration(true)"
+        class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition-colors">Retry
+        Failed Chapters</button>
+      }
+
+      <button (click)="downloadEpub()" [disabled]="isLoading() || successfulChaptersCount() === 0"
+        class="w-full sm:col-span-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+        @if(isLoading()){
+        <app-icon-spinner class="h-5 w-5 text-white"></app-icon-spinner>
+        <span>Building...</span>
+        } @else {
+        <span>Download EPUB ({{ successfulChaptersCount() }} chapters)</span>
+        }
+      </button>
+
+      <button (click)="downloadTxt()" [disabled]="successfulChaptersCount() === 0"
+        class="w-full sm:col-span-2 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2">
+        <span>Download TXT</span>
+      </button>
+    </div>
     }
 
   </div>
 
   <!-- SIDE MENU: Advanced Settings -->
   @if (isSideMenuVisible()) {
-    <div class="fixed inset-0 z-40 animate-fade-in-fast">
-      <!-- Overlay -->
-      <div class="absolute inset-0 bg-black/60" (click)="toggleSideMenu()"></div>
-      
-      <!-- Menu Content -->
-      <div class="relative z-50 h-full w-full max-w-md bg-white dark:bg-gray-800 shadow-2xl ml-auto flex flex-col animate-slide-in-right">
-        <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center shrink-0">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Advanced Settings</h3>
-          <button (click)="toggleSideMenu()" class="text-2xl font-light text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">&times;</button>
+  <div class="fixed inset-0 z-40 animate-fade-in-fast">
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black/60" (click)="toggleSideMenu()"></div>
+
+    <!-- Menu Content -->
+    <div
+      class="relative z-50 h-full w-full max-w-full sm:max-w-md bg-white dark:bg-gray-800 shadow-2xl ml-auto flex flex-col animate-slide-in-right">
+      <div class="p-4 sm:p-5 border-b dark:border-gray-700 flex justify-between items-center shrink-0">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Advanced Settings</h3>
+        <button (click)="toggleSideMenu()"
+          class="p-2 text-2xl font-light text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 touch-target">&times;</button>
+      </div>
+      <div class="overflow-y-auto p-4 space-y-1" [formGroup]="configForm">
+
+        <!-- Accordion Item: General -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+          <button (click)="toggleAccordion('general')"
+            class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
+            <span>General</span>
+            <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300"
+              [class.rotate-180]="activeAccordionSection() === 'general'"></app-icon-chevron-down>
+          </button>
+          @if (activeAccordionSection() === 'general') {
+          <div
+            class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
+            <div class="space-y-2 sm:space-y-0 sm:flex sm:space-x-2">
+              <input type="text" [formControl]="$any(uiStateForm.get('presetName'))" placeholder="New preset name..."
+                class="flex-grow w-full sm:w-auto bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+              <button (click)="savePreset()" [disabled]="savePresetSuccess()"
+                class="w-full sm:w-auto px-4 py-2 text-white text-sm font-medium rounded-md transition-colors"
+                [class.bg-green-500]="savePresetSuccess()" [class.hover:bg-green-600]="savePresetSuccess()"
+                [class.bg-indigo-500]="!savePresetSuccess()" [class.hover:bg-indigo-600]="!savePresetSuccess()">
+                @if (savePresetSuccess()) {
+                <span>✓ Saved!</span>
+                } @else {
+                <span>{{ saveButtonText() }}</span>
+                }
+              </button>
+            </div>
+            @if(presets().length > 0) {
+            <div class="space-y-2 sm:space-y-0 sm:flex sm:space-x-2">
+              <select [formControl]="$any(uiStateForm.get('selectedPreset'))"
+                class="flex-grow w-full sm:w-auto bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="" disabled>Select a preset to load...</option>
+                @if(userPresets().length > 0) {
+                <optgroup label="My Presets">
+                  @for (preset of userPresets(); track preset.name) { <option [value]="preset.name">{{ preset.name }}
+                  </option> }
+                </optgroup>
+                }
+                @if(defaultPresets().length > 0) {
+                <optgroup label="Default Presets">
+                  @for (preset of defaultPresets(); track preset.name) { <option [value]="preset.name">{{ preset.name }}
+                  </option> }
+                </optgroup>
+                }
+              </select>
+              <button (click)="loadSelectedPreset()" [disabled]="!uiStateForm.get('selectedPreset')?.value"
+                class="w-full sm:w-auto px-4 py-2 bg-gray-600 dark:bg-gray-600 text-white dark:text-gray-50 text-sm font-medium rounded-md hover:bg-gray-700 disabled:opacity-50">Load</button>
+              <button (click)="deleteSelectedPreset()"
+                [disabled]="!uiStateForm.get('selectedPreset')?.value || isDefaultPreset(uiStateForm.get('selectedPreset')?.value)"
+                class="w-full sm:w-auto px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed">Delete</button>
+            </div>
+            } @else {
+            <div class="text-center py-2 px-4 bg-gray-100 dark:bg-gray-700/60 rounded-md">
+              <p class="text-sm text-gray-500 dark:text-gray-400">You haven't saved any custom presets yet.</p>
+            </div>
+            }
+            <div class="flex space-x-2">
+              <button (click)="exportSettings()" [disabled]="exportSettingsSuccess()"
+                class="w-full px-4 py-2 text-sm font-medium rounded-md transition-colors"
+                [class.bg-green-500]="exportSettingsSuccess()" [class.text-white]="exportSettingsSuccess()"
+                [class.bg-gray-200]="!exportSettingsSuccess()" [class.dark:bg-gray-600]="!exportSettingsSuccess()"
+                [class.text-gray-800]="!exportSettingsSuccess()" [class.dark:text-gray-50]="!exportSettingsSuccess()"
+                [class.hover:bg-gray-300]="!exportSettingsSuccess()"
+                [class.dark:hover:bg-gray-500]="!exportSettingsSuccess()">
+                @if(exportSettingsSuccess()) {
+                <span>✓ Exported!</span>
+                } @else {
+                <span>Export</span>
+                }
+              </button>
+              <button (click)="$any($event.target).nextElementSibling.click()"
+                class="w-full px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-50 text-sm font-medium rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Import</button>
+              <input type="file" (change)="importSettings($event)" accept=".json" class="hidden">
+            </div>
+          </div>
+          }
         </div>
-        <div class="overflow-y-auto p-4 space-y-1" [formGroup]="configForm">
-          
-          <!-- Accordion Item: General -->
-          <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
-            <button (click)="toggleAccordion('general')" class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
-              <span>General</span>
-              <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300" [class.rotate-180]="activeAccordionSection() === 'general'"></app-icon-chevron-down>
-            </button>
-            @if (activeAccordionSection() === 'general') {
-              <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
-                  <div class="space-y-2 sm:space-y-0 sm:flex sm:space-x-2">
-                    <input type="text" [formControl]="$any(uiStateForm.get('presetName'))" placeholder="New preset name..." class="flex-grow w-full sm:w-auto bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                    <button (click)="savePreset()" 
-                      [disabled]="savePresetSuccess()"
-                      class="w-full sm:w-auto px-4 py-2 text-white text-sm font-medium rounded-md transition-colors"
-                      [class.bg-green-500]="savePresetSuccess()"
-                      [class.hover:bg-green-600]="savePresetSuccess()"
-                      [class.bg-indigo-500]="!savePresetSuccess()"
-                      [class.hover:bg-indigo-600]="!savePresetSuccess()">
-                      @if (savePresetSuccess()) {
-                        <span>✓ Saved!</span>
-                      } @else {
-                        <span>{{ saveButtonText() }}</span>
-                      }
-                    </button>
-                  </div>
-                  @if(presets().length > 0) {
-                    <div class="space-y-2 sm:space-y-0 sm:flex sm:space-x-2">
-                      <select [formControl]="$any(uiStateForm.get('selectedPreset'))" class="flex-grow w-full sm:w-auto bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="" disabled>Select a preset to load...</option>
-                        @if(userPresets().length > 0) {
-                          <optgroup label="My Presets">
-                            @for (preset of userPresets(); track preset.name) { <option [value]="preset.name">{{ preset.name }}</option> }
-                          </optgroup>
-                        }
-                        @if(defaultPresets().length > 0) {
-                          <optgroup label="Default Presets">
-                             @for (preset of defaultPresets(); track preset.name) { <option [value]="preset.name">{{ preset.name }}</option> }
-                          </optgroup>
-                        }
-                      </select>
-                      <button (click)="loadSelectedPreset()" [disabled]="!uiStateForm.get('selectedPreset')?.value" class="w-full sm:w-auto px-4 py-2 bg-gray-600 dark:bg-gray-600 text-white dark:text-gray-50 text-sm font-medium rounded-md hover:bg-gray-700 disabled:opacity-50">Load</button>
-                      <button (click)="deleteSelectedPreset()" [disabled]="!uiStateForm.get('selectedPreset')?.value || isDefaultPreset(uiStateForm.get('selectedPreset')?.value)" class="w-full sm:w-auto px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed">Delete</button>
-                    </div>
-                  } @else {
-                    <div class="text-center py-2 px-4 bg-gray-100 dark:bg-gray-700/60 rounded-md">
-                      <p class="text-sm text-gray-500 dark:text-gray-400">You haven't saved any custom presets yet.</p>
-                    </div>
-                  }
-                  <div class="flex space-x-2">
-                      <button (click)="exportSettings()" 
-                        [disabled]="exportSettingsSuccess()"
-                        class="w-full px-4 py-2 text-sm font-medium rounded-md transition-colors"
-                        [class.bg-green-500]="exportSettingsSuccess()"
-                        [class.text-white]="exportSettingsSuccess()"
-                        [class.bg-gray-200]="!exportSettingsSuccess()"
-                        [class.dark:bg-gray-600]="!exportSettingsSuccess()"
-                        [class.text-gray-800]="!exportSettingsSuccess()"
-                        [class.dark:text-gray-50]="!exportSettingsSuccess()"
-                        [class.hover:bg-gray-300]="!exportSettingsSuccess()"
-                        [class.dark:hover:bg-gray-500]="!exportSettingsSuccess()">
-                        @if(exportSettingsSuccess()) {
-                           <span>✓ Exported!</span>
-                        } @else {
-                          <span>Export</span>
-                        }
-                      </button>
-                      <button (click)="$any($event.target).nextElementSibling.click()" class="w-full px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-50 text-sm font-medium rounded-md hover:bg-gray-300 dark:hover:bg-gray-500">Import</button>
-                      <input type="file" (change)="importSettings($event)" accept=".json" class="hidden">
-                  </div>
+
+        <!-- Accordion Item: Data Source -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+          <button (click)="toggleAccordion('dataSource')"
+            class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
+            <span>Data Source</span>
+            <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300"
+              [class.rotate-180]="activeAccordionSection() === 'dataSource'"></app-icon-chevron-down>
+          </button>
+          @if (activeAccordionSection() === 'dataSource') {
+          <div
+            class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Use for sites that load chapters with JavaScript. Try a "Headless" proxy first. If that fails, find the
+              site's JSON API using browser DevTools and use the JSON API mode.
+            </p>
+            <fieldset class="space-y-2">
+              <legend class="sr-only">Data Source Type</legend>
+              <div class="relative flex items-start">
+                <div class="flex h-6 items-center">
+                  <input id="ds-html" name="dataSourceType" type="radio" value="html" formControlName="dataSourceType"
+                    class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-indigo-600 dark:ring-offset-gray-800">
+                </div>
+                <div class="ml-3 text-sm leading-6">
+                  <label for="ds-html" class="font-medium text-gray-900 dark:text-gray-100">HTML Page (Default)</label>
+                  <p class="text-gray-500 dark:text-gray-400 text-xs">Scrapes chapter links from the page's HTML source.
+                  </p>
+                </div>
               </div>
+              <div class="relative flex items-start">
+                <div class="flex h-6 items-center">
+                  <input id="ds-json" name="dataSourceType" type="radio" value="json" formControlName="dataSourceType"
+                    class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-indigo-600 dark:ring-offset-gray-800">
+                </div>
+                <div class="ml-3 text-sm leading-6">
+                  <label for="ds-json" class="font-medium text-gray-900 dark:text-gray-100">JSON API</label>
+                  <p class="text-gray-500 dark:text-gray-400 text-xs">Fetches chapter list from a JSON API endpoint.</p>
+                </div>
+              </div>
+            </fieldset>
+
+            @if (config().dataSourceType === 'json') {
+            <div class="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-700 animate-fade-in">
+              @for (item of [
+              { key: 'jsonChapterListPath', name: 'Chapter List Path', placeholder: 'e.g., data.chapters', help: 'Dot
+              notation path to the array of chapters in the JSON response.' },
+              { key: 'jsonChapterUrlPath', name: 'Chapter URL Path', placeholder: 'e.g., chapter.url', help: 'Path
+              within a chapter object to find the relative URL.' },
+              { key: 'jsonChapterTitlePath', name: 'Chapter Title Path', placeholder: 'e.g., chapter.name', help: 'Path
+              within a chapter object to find the title.' },
+              { key: 'jsonNextPagePath', name: 'Next Page Path (Optional)', placeholder: 'e.g., meta.next_page_url',
+              help: 'Path to find the URL for the next page of results for paginated APIs.' }
+              ]; track item.key) {
+              <div>
+                <label [for]="item.key"
+                  class="flex items-center space-x-1 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <span>{{ item.name }}</span>
+                  <span class="cursor-help text-gray-400 dark:text-gray-500" [title]="item.help">
+                    <app-icon-info class="h-4 w-4"></app-icon-info>
+                  </span>
+                </label>
+                <input [id]="item.key" type="text" [formControlName]="item.key" [placeholder]="item.placeholder"
+                  class="flex-grow w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+              </div>
+              }
+            </div>
             }
           </div>
+          }
+        </div>
 
-          <!-- Accordion Item: Data Source -->
-          <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
-            <button (click)="toggleAccordion('dataSource')" class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
-              <span>Data Source</span>
-              <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300" [class.rotate-180]="activeAccordionSection() === 'dataSource'"></app-icon-chevron-down>
-            </button>
-            @if (activeAccordionSection() === 'dataSource') {
-              <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  Use for sites that load chapters with JavaScript. Try a "Headless" proxy first. If that fails, find the site's JSON API using browser DevTools and use the JSON API mode.
-                </p>
-                <fieldset class="space-y-2">
-                  <legend class="sr-only">Data Source Type</legend>
-                  <div class="relative flex items-start">
-                    <div class="flex h-6 items-center">
-                      <input id="ds-html" name="dataSourceType" type="radio" value="html" formControlName="dataSourceType" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-indigo-600 dark:ring-offset-gray-800">
-                    </div>
-                    <div class="ml-3 text-sm leading-6">
-                      <label for="ds-html" class="font-medium text-gray-900 dark:text-gray-100">HTML Page (Default)</label>
-                      <p class="text-gray-500 dark:text-gray-400 text-xs">Scrapes chapter links from the page's HTML source.</p>
-                    </div>
-                  </div>
-                   <div class="relative flex items-start">
-                    <div class="flex h-6 items-center">
-                      <input id="ds-json" name="dataSourceType" type="radio" value="json" formControlName="dataSourceType" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-indigo-600 dark:ring-offset-gray-800">
-                    </div>
-                    <div class="ml-3 text-sm leading-6">
-                      <label for="ds-json" class="font-medium text-gray-900 dark:text-gray-100">JSON API</label>
-                       <p class="text-gray-500 dark:text-gray-400 text-xs">Fetches chapter list from a JSON API endpoint.</p>
-                    </div>
-                  </div>
-                </fieldset>
+        <!-- Accordion Item: Metadata Selectors -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+          <button (click)="toggleAccordion('metadata')"
+            class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
+            <span>Metadata Selectors</span>
+            <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300"
+              [class.rotate-180]="activeAccordionSection() === 'metadata'"></app-icon-chevron-down>
+          </button>
+          @if (activeAccordionSection() === 'metadata') {
+          <div
+            class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
+            <p class="text-xs text-gray-500 dark:text-gray-400">Selectors for finding novel info on the Table of
+              Contents page.</p>
+            @for (item of [
+            { key: 'novelTitleSelector', name: 'Novel Title', placeholder: 'e.g., h1.novel-title', help: 'CSS selector
+            for the novel\'s title on the TOC page.' },
+            { key: 'authorSelector', name: 'Author', placeholder: 'e.g., .author-name', help: 'CSS selector for the
+            author\'s name on the TOC page.' },
+            { key: 'synopsisSelector', name: 'Synopsis', placeholder: 'e.g., .summary > p', help: 'CSS selector for the
+            novel\'s synopsis on the TOC page.' },
+            { key: 'coverImageSelector', name: 'Cover Image', placeholder: 'e.g., .cover img', help: 'CSS selector for
+            the <img> element of the cover on the TOC page.' }
+            ]; track item.key) {
+            <app-selector-tester [control]="$any(configForm.get(item.key))" [selectorKey]="$any(item.key)"
+              [title]="item.name" [placeholder]="item.placeholder" [help]="item.help"
+              [state]="selectorTestStates()[item.key]" (testRequested)="testSelector($event.selectorKey, $event.title)">
+            </app-selector-tester>
+            }
+          </div>
+          }
+        </div>
 
-                @if (config().dataSourceType === 'json') {
-                  <div class="space-y-3 pt-3 border-t border-gray-200 dark:border-gray-700 animate-fade-in">
-                    @for (item of [
-                        { key: 'jsonChapterListPath', name: 'Chapter List Path', placeholder: 'e.g., data.chapters', help: 'Dot notation path to the array of chapters in the JSON response.' },
-                        { key: 'jsonChapterUrlPath', name: 'Chapter URL Path', placeholder: 'e.g., chapter.url', help: 'Path within a chapter object to find the relative URL.' },
-                        { key: 'jsonChapterTitlePath', name: 'Chapter Title Path', placeholder: 'e.g., chapter.name', help: 'Path within a chapter object to find the title.' },
-                        { key: 'jsonNextPagePath', name: 'Next Page Path (Optional)', placeholder: 'e.g., meta.next_page_url', help: 'Path to find the URL for the next page of results for paginated APIs.' }
-                    ]; track item.key) {
-                        <div>
-                           <label [for]="item.key" class="flex items-center space-x-1 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                              <span>{{ item.name }}</span>
-                               <span class="cursor-help text-gray-400 dark:text-gray-500" [title]="item.help">
-                                    <app-icon-info class="h-4 w-4"></app-icon-info>
-                                </span>
-                            </label>
-                            <input [id]="item.key" type="text" [formControlName]="item.key" [placeholder]="item.placeholder" class="flex-grow w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                        </div>
-                    }
-                  </div>
+        <!-- Accordion Item: Chapter Parsing -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+          <button (click)="toggleAccordion('parsing')"
+            class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
+            <span>Chapter Parsing</span>
+            <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300"
+              [class.rotate-180]="activeAccordionSection() === 'parsing'"></app-icon-chevron-down>
+          </button>
+          @if (activeAccordionSection() === 'parsing') {
+          <div
+            class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
+            @for (item of [
+            { key: 'tocLinkSelector', name: 'Chapter Link Selector', placeholder: 'e.g., .chapter-list a', help: 'CSS
+            selector for the <a> tags pointing to chapters on the TOC page.', required: true },
+              { key: 'chapterContainerSelector', name: 'Chapter Content Container', placeholder: 'e.g.,
+              .reading-content', help: 'Selector for the main element containing the chapter text.', required: true },
+              { key: 'chapterTitleSelector', name: 'Chapter Title Selector', placeholder: 'e.g., h2.chapter-title',
+              help: 'Optional. Use if the chapter title inside the page is better than the link text from the TOC.' },
+              { key: 'nextPageLinkSelector', name: 'Next Page Link Selector', placeholder: 'e.g., a.next-page', help:
+              'Optional. Selector for the link to the next part of a chapter (for paginated chapters).' }
+              ]; track item.key) {
+              <app-selector-tester [control]="$any(configForm.get(item.key))" [selectorKey]="$any(item.key)"
+                [title]="item.name + (item.required ? ' *' : '')" [placeholder]="item.placeholder" [help]="item.help"
+                [state]="selectorTestStates()[item.key]"
+                (testRequested)="testSelector($event.selectorKey, $event.title)">
+              </app-selector-tester>
+              }
+              <div class="relative flex items-start mt-2">
+                <div class="flex h-6 items-center">
+                  <input id="paginatedToc" type="checkbox" formControlName="paginatedToc"
+                    class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:ring-offset-gray-800">
+                </div>
+                <div class="ml-3 text-sm leading-6">
+                  <label for="paginatedToc" class="font-medium text-gray-900 dark:text-gray-100">Paginated Table of
+                    Contents</label>
+                </div>
+              </div>
+              @if (config().paginatedToc) {
+              <div class="animate-fade-in pl-9">
+                <label for="tocNextPageSelector"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Next TOC Page Link
+                  Selector</label>
+                <input id="tocNextPageSelector" type="text" formControlName="tocNextPageSelector"
+                  placeholder="e.g., a.next-page"
+                  class="flex-grow w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+              </div>
+              }
+          </div>
+          }
+        </div>
+
+        <!-- Accordion Item: Content Cleanup -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+          <button (click)="toggleAccordion('cleanup')"
+            class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
+            <span>Content Cleanup</span>
+            <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300"
+              [class.rotate-180]="activeAccordionSection() === 'cleanup'"></app-icon-chevron-down>
+          </button>
+          @if (activeAccordionSection() === 'cleanup') {
+          <div
+            class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
+            <div>
+              <label for="elementsToRemoveSelector"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CSS Selectors to Remove</label>
+              <textarea id="elementsToRemoveSelector" rows="2" formControlName="elementsToRemoveSelector"
+                placeholder="e.g., .comments, #social-links"
+                class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Comma-separated selectors for elements to remove
+                from chapter content (e.g., ads, navigation).</p>
+            </div>
+            <div>
+              <label for="textToRemove" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Exact
+                Phrases to Remove</label>
+              <div class="flex space-x-2">
+                <input id="textToRemove" type="text" [formControl]="$any(uiStateForm.get('newTextToRemove'))"
+                  (keydown.enter)="addTextToRemove()" placeholder="Add a phrase to remove..."
+                  class="flex-grow bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                <button (click)="addTextToRemove()"
+                  class="px-4 py-2 bg-indigo-500 text-white text-sm font-medium rounded-md hover:bg-indigo-600 shrink-0">Add</button>
+              </div>
+              @if (textToRemoveControls.length > 0) {
+              <div class="mt-2 space-y-1 max-h-40 overflow-y-auto" formArrayName="textToRemove">
+                @for (control of textToRemoveControls; track $index) {
+                <div
+                  class="flex items-center justify-between bg-gray-100 dark:bg-gray-700/60 p-2 rounded-md text-sm animate-fade-in-fast">
+                  <span class="text-gray-800 dark:text-gray-200 break-all pr-2">{{ control.value }}</span>
+                  <button (click)="removeTextToRemove($index)"
+                    class="text-red-500 hover:text-red-700 dark:hover:text-red-400 font-bold text-lg shrink-0"
+                    title="Remove phrase">&times;</button>
+                </div>
                 }
               </div>
-            }
-          </div>
-          
-          <!-- Accordion Item: Metadata Selectors -->
-          <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
-            <button (click)="toggleAccordion('metadata')" class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
-              <span>Metadata Selectors</span>
-              <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300" [class.rotate-180]="activeAccordionSection() === 'metadata'"></app-icon-chevron-down>
-            </button>
-             @if (activeAccordionSection() === 'metadata') {
-              <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
-                <p class="text-xs text-gray-500 dark:text-gray-400">Selectors for finding novel info on the Table of Contents page.</p>
-                @for (item of [
-                  { key: 'novelTitleSelector', name: 'Novel Title', placeholder: 'e.g., h1.novel-title', help: 'CSS selector for the novel\'s title on the TOC page.' },
-                  { key: 'authorSelector', name: 'Author', placeholder: 'e.g., .author-name', help: 'CSS selector for the author\'s name on the TOC page.' },
-                  { key: 'synopsisSelector', name: 'Synopsis', placeholder: 'e.g., .summary > p', help: 'CSS selector for the novel\'s synopsis on the TOC page.' },
-                  { key: 'coverImageSelector', name: 'Cover Image', placeholder: 'e.g., .cover img', help: 'CSS selector for the <img> element of the cover on the TOC page.' }
-                ]; track item.key) {
-                  <app-selector-tester
-                    [control]="$any(configForm.get(item.key))"
-                    [selectorKey]="$any(item.key)"
-                    [title]="item.name"
-                    [placeholder]="item.placeholder"
-                    [help]="item.help"
-                    [state]="selectorTestStates()[item.key]"
-                    (testRequested)="testSelector($event.selectorKey, $event.title)">
-                  </app-selector-tester>
-                }
+              } @else {
+              <div class="mt-2 text-center py-2 px-4 bg-gray-100 dark:bg-gray-700/60 rounded-md">
+                <p class="text-sm text-gray-500 dark:text-gray-400">No phrases to remove have been added.</p>
               </div>
-            }
-          </div>
-
-           <!-- Accordion Item: Chapter Parsing -->
-          <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
-            <button (click)="toggleAccordion('parsing')" class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
-              <span>Chapter Parsing</span>
-               <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300" [class.rotate-180]="activeAccordionSection() === 'parsing'"></app-icon-chevron-down>
+              }
+            </div>
+            <div class="relative flex items-start mt-2">
+              <div class="flex h-6 items-center">
+                <input id="includeTitleInContent" type="checkbox" formControlName="includeTitleInContent"
+                  class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:ring-offset-gray-800">
+              </div>
+              <div class="ml-3 text-sm leading-6">
+                <label for="includeTitleInContent" class="font-medium text-gray-900 dark:text-gray-100">Include chapter
+                  title in EPUB content</label>
+              </div>
+            </div>
+            <div class="relative flex items-start mt-2">
+              <div class="flex h-6 items-center">
+                <input id="includeTitleInTxt" type="checkbox" formControlName="includeTitleInTxt"
+                  class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:ring-offset-gray-800">
+              </div>
+              <div class="ml-3 text-sm leading-6">
+                <label for="includeTitleInTxt" class="font-medium text-gray-900 dark:text-gray-100">Include chapter
+                  title in TXT file</label>
+              </div>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+            <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-base">Test Chapter Preview</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              Test all chapter and cleanup settings by fetching and cleaning the "First Chapter URL". This shows you
+              exactly what the content will look like in the final EPUB.
+            </p>
+            <button (click)="testChapterPreview()" [disabled]="!config().firstChapterUrl"
+              class="w-full mt-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">
+              Preview First Chapter
             </button>
-             @if (activeAccordionSection() === 'parsing') {
-               <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
-                @for (item of [
-                    { key: 'tocLinkSelector', name: 'Chapter Link Selector', placeholder: 'e.g., .chapter-list a', help: 'CSS selector for the <a> tags pointing to chapters on the TOC page.', required: true },
-                    { key: 'chapterContainerSelector', name: 'Chapter Content Container', placeholder: 'e.g., .reading-content', help: 'Selector for the main element containing the chapter text.', required: true },
-                    { key: 'chapterTitleSelector', name: 'Chapter Title Selector', placeholder: 'e.g., h2.chapter-title', help: 'Optional. Use if the chapter title inside the page is better than the link text from the TOC.' },
-                    { key: 'nextPageLinkSelector', name: 'Next Page Link Selector', placeholder: 'e.g., a.next-page', help: 'Optional. Selector for the link to the next part of a chapter (for paginated chapters).' }
-                ]; track item.key) {
-                  <app-selector-tester
-                    [control]="$any(configForm.get(item.key))"
-                    [selectorKey]="$any(item.key)"
-                    [title]="item.name + (item.required ? ' *' : '')"
-                    [placeholder]="item.placeholder"
-                    [help]="item.help"
-                    [state]="selectorTestStates()[item.key]"
-                    (testRequested)="testSelector($event.selectorKey, $event.title)">
-                  </app-selector-tester>
-                 }
-                <div class="relative flex items-start mt-2">
-                    <div class="flex h-6 items-center">
-                      <input id="paginatedToc" type="checkbox" formControlName="paginatedToc" class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:ring-offset-gray-800">
-                    </div>
-                    <div class="ml-3 text-sm leading-6">
-                      <label for="paginatedToc" class="font-medium text-gray-900 dark:text-gray-100">Paginated Table of Contents</label>
-                    </div>
-                </div>
-                 @if (config().paginatedToc) {
-                    <div class="animate-fade-in pl-9">
-                      <label for="tocNextPageSelector" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Next TOC Page Link Selector</label>
-                      <input id="tocNextPageSelector" type="text" formControlName="tocNextPageSelector" placeholder="e.g., a.next-page" class="flex-grow w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                    </div>
-                  }
-               </div>
-             }
           </div>
+          }
+        </div>
 
-          <!-- Accordion Item: Content Cleanup -->
-          <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
-            <button (click)="toggleAccordion('cleanup')" class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
-              <span>Content Cleanup</span>
-               <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300" [class.rotate-180]="activeAccordionSection() === 'cleanup'"></app-icon-chevron-down>
-            </button>
-            @if (activeAccordionSection() === 'cleanup') {
-              <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
-                <div>
-                  <label for="elementsToRemoveSelector" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">CSS Selectors to Remove</label>
-                  <textarea id="elementsToRemoveSelector" rows="2" formControlName="elementsToRemoveSelector" placeholder="e.g., .comments, #social-links" class="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Comma-separated selectors for elements to remove from chapter content (e.g., ads, navigation).</p>
-                </div>
-                <div>
-                  <label for="textToRemove" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Exact Phrases to Remove</label>
-                  <div class="flex space-x-2">
-                    <input id="textToRemove" type="text" [formControl]="$any(uiStateForm.get('newTextToRemove'))" (keydown.enter)="addTextToRemove()" placeholder="Add a phrase to remove..." class="flex-grow bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                    <button (click)="addTextToRemove()" class="px-4 py-2 bg-indigo-500 text-white text-sm font-medium rounded-md hover:bg-indigo-600 shrink-0">Add</button>
-                  </div>
-                  @if (textToRemoveControls.length > 0) {
-                    <div class="mt-2 space-y-1 max-h-40 overflow-y-auto" formArrayName="textToRemove">
-                      @for (control of textToRemoveControls; track $index) {
-                        <div class="flex items-center justify-between bg-gray-100 dark:bg-gray-700/60 p-2 rounded-md text-sm animate-fade-in-fast">
-                          <span class="text-gray-800 dark:text-gray-200 break-all pr-2">{{ control.value }}</span>
-                          <button (click)="removeTextToRemove($index)" class="text-red-500 hover:text-red-700 dark:hover:text-red-400 font-bold text-lg shrink-0" title="Remove phrase">&times;</button>
-                        </div>
-                      }
-                    </div>
+        <!-- Accordion Item: Performance & Network -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+          <button (click)="toggleAccordion('performance')"
+            class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
+            <span>Performance & Network</span>
+            <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300"
+              [class.rotate-180]="activeAccordionSection() === 'performance'"></app-icon-chevron-down>
+          </button>
+          @if (activeAccordionSection() === 'performance') {
+          <div
+            class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
+            <div>
+              <label for="proxyUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Proxy URL
+              </label>
+              <div class="flex items-center space-x-2">
+                <input id="proxyUrl" type="text" formControlName="proxyUrl"
+                  class="flex-grow bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                <button (click)="toggleProxy()"
+                  class="px-3 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md shrink-0">
+                  @if (configForm.get('proxyUrl')?.value) {
+                  <span>Disable</span>
                   } @else {
-                     <div class="mt-2 text-center py-2 px-4 bg-gray-100 dark:bg-gray-700/60 rounded-md">
-                      <p class="text-sm text-gray-500 dark:text-gray-400">No phrases to remove have been added.</p>
-                    </div>
+                  <span>Use Default</span>
                   }
-                </div>
-                <div class="relative flex items-start mt-2">
-                    <div class="flex h-6 items-center">
-                      <input id="includeTitleInContent" type="checkbox" formControlName="includeTitleInContent" class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:ring-offset-gray-800">
-                    </div>
-                    <div class="ml-3 text-sm leading-6">
-                      <label for="includeTitleInContent" class="font-medium text-gray-900 dark:text-gray-100">Include chapter title in EPUB content</label>
-                    </div>
-                </div>
-                <div class="relative flex items-start mt-2">
-                    <div class="flex h-6 items-center">
-                      <input id="includeTitleInTxt" type="checkbox" formControlName="includeTitleInTxt" class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-600 dark:bg-gray-600 dark:ring-offset-gray-800">
-                    </div>
-                    <div class="ml-3 text-sm leading-6">
-                      <label for="includeTitleInTxt" class="font-medium text-gray-900 dark:text-gray-100">Include chapter title in TXT file</label>
-                    </div>
-                </div>
-                 <div class="border-t border-gray-200 dark:border-gray-700 my-2"></div>
-                 <h3 class="font-semibold text-gray-800 dark:text-gray-100 text-base">Test Chapter Preview</h3>
-                 <p class="text-xs text-gray-500 dark:text-gray-400">
-                  Test all chapter and cleanup settings by fetching and cleaning the "First Chapter URL". This shows you exactly what the content will look like in the final EPUB.
-                </p>
-                <button (click)="testChapterPreview()" [disabled]="!config().firstChapterUrl" class="w-full mt-2 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 disabled:bg-green-400 disabled:cursor-not-allowed">
-                  Preview First Chapter
                 </button>
               </div>
-            }
-          </div>
-
-          <!-- Accordion Item: Performance & Network -->
-          <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
-            <button (click)="toggleAccordion('performance')" class="w-full flex justify-between items-center p-3 font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-t-lg">
-              <span>Performance & Network</span>
-               <app-icon-chevron-down class="h-5 w-5 transition-transform duration-300" [class.rotate-180]="activeAccordionSection() === 'performance'"></app-icon-chevron-down>
-            </button>
-            @if (activeAccordionSection() === 'performance') {
-              <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg border-t dark:border-gray-700 space-y-4 animate-fade-in-fast">
-                <div>
-                  <label for="proxyUrl" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Proxy URL
-                  </label>
-                  <div class="flex items-center space-x-2">
-                    <input id="proxyUrl" type="text" formControlName="proxyUrl" class="flex-grow bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-800 dark:text-gray-50 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                    <button (click)="toggleProxy()" class="px-3 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md shrink-0">
-                      @if (configForm.get('proxyUrl')?.value) {
-                        <span>Disable</span>
-                      } @else {
-                        <span>Use Default</span>
-                      }
-                    </button>
-                  </div>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Needed to bypass browser CORS security. Disabling the proxy will likely cause fetch errors for most websites. If fetching fails, try another, e.g., `https://corsproxy.io/?`.</p>
-                </div>
-                <div>
-                  <label for="requestDelay" class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    <span>Request Delay</span>
-                    <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().requestDelay }} ms</span>
-                  </label>
-                  <input id="requestDelay" type="range" min="0" max="5000" step="50" formControlName="requestDelay" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Delay between chapter downloads to avoid rate-limiting.</p>
-                </div>
-                <div>
-                  <label for="concurrentDownloads" class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    <span>Concurrent Downloads</span>
-                    <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().concurrentDownloads }}</span>
-                  </label>
-                  <input id="concurrentDownloads" type="range" min="1" max="10" step="1" formControlName="concurrentDownloads" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Number of chapters to download at the same time.</p>
-                </div>
-                <div class="pt-2 border-t dark:border-gray-700">
-                  <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Failure Handling</h4>
-                   <div>
-                      <label for="maxRetries" class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        <span>Max Retries</span>
-                        <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().maxRetries }}</span>
-                      </label>
-                      <input id="maxRetries" type="range" min="0" max="10" step="1" formControlName="maxRetries" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-                    </div>
-                     <div class="mt-4">
-                      <label for="retryDelay" class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        <span>Retry Delay</span>
-                        <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().retryDelay }} ms</span>
-                      </label>
-                      <input id="retryDelay" type="range" min="100" max="5000" step="100" formControlName="retryDelay" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-                    </div>
-                </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Needed to bypass browser CORS security. Disabling
+                the proxy will likely cause fetch errors for most websites. If fetching fails, try another, e.g.,
+                `https://corsproxy.io/?`.</p>
+            </div>
+            <div>
+              <label for="requestDelay"
+                class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <span>Request Delay</span>
+                <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().requestDelay }} ms</span>
+              </label>
+              <input id="requestDelay" type="range" min="0" max="5000" step="50" formControlName="requestDelay"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Delay between chapter downloads to avoid
+                rate-limiting.</p>
+            </div>
+            <div>
+              <label for="concurrentDownloads"
+                class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <span>Concurrent Downloads</span>
+                <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().concurrentDownloads }}</span>
+              </label>
+              <input id="concurrentDownloads" type="range" min="1" max="10" step="1"
+                formControlName="concurrentDownloads"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Number of chapters to download at the same time.
+              </p>
+            </div>
+            <div class="pt-2 border-t dark:border-gray-700">
+              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Failure Handling</h4>
+              <div>
+                <label for="maxRetries"
+                  class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <span>Max Retries</span>
+                  <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().maxRetries }}</span>
+                </label>
+                <input id="maxRetries" type="range" min="0" max="10" step="1" formControlName="maxRetries"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
               </div>
-            }
+              <div class="mt-4">
+                <label for="retryDelay"
+                  class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <span>Retry Delay</span>
+                  <span class="font-mono text-indigo-600 dark:text-indigo-400">{{ config().retryDelay }} ms</span>
+                </label>
+                <input id="retryDelay" type="range" min="100" max="5000" step="100" formControlName="retryDelay"
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+              </div>
+            </div>
           </div>
-
+          }
         </div>
+
       </div>
     </div>
+  </div>
   }
 
 
   <!-- MODAL: Chapter Preview -->
   @if (previewingChapter(); as chapter) {
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in-fast">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl m-4 flex flex-col max-h-[90vh]">
-        <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center shrink-0">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">{{ chapter.title }}</h3>
-          <button (click)="closePreview()" class="text-2xl font-light text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">&times;</button>
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in-fast">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl m-4 flex flex-col max-h-[90vh]">
+      <div class="p-5 border-b dark:border-gray-700 flex justify-between items-center shrink-0">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">{{ chapter.title }}</h3>
+        <button (click)="closePreview()"
+          class="text-2xl font-light text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">&times;</button>
+      </div>
+      <div class="p-6 overflow-y-auto prose dark:prose-invert max-w-none">
+        @if (isFetchingPreview()) {
+        <div class="flex items-center justify-center space-x-2 text-gray-600 dark:text-gray-300">
+          <app-icon-spinner class="h-5 w-5 text-indigo-500"></app-icon-spinner>
+          <span>Fetching preview...</span>
         </div>
-        <div class="p-6 overflow-y-auto prose dark:prose-invert max-w-none">
-          @if (isFetchingPreview()) {
-            <div class="flex items-center justify-center space-x-2 text-gray-600 dark:text-gray-300">
-              <app-icon-spinner class="h-5 w-5 text-indigo-500"></app-icon-spinner>
-              <span>Fetching preview...</span>
-            </div>
-          }
-          @if (previewError(); as error) {
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
-              <p class="font-bold">Error loading preview</p>
-              <p>{{ error }}</p>
-            </div>
-          }
-          @if (previewContent(); as content) {
-              <article>
-                <h1 class="text-2xl font-bold mb-4">{{ content.title }}</h1>
-                <div [innerHTML]="content.content"></div>
-              </article>
-          }
+        }
+        @if (previewError(); as error) {
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md">
+          <p class="font-bold">Error loading preview</p>
+          <p>{{ error }}</p>
         </div>
-        <div class="p-4 bg-gray-50 dark:bg-slate-800 border-t dark:border-gray-700 text-right shrink-0">
-          <button (click)="closePreview()" class="px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-50 text-sm font-medium rounded-md">Close</button>
-        </div>
+        }
+        @if (previewContent(); as content) {
+        <article>
+          <h1 class="text-2xl font-bold mb-4">{{ content.title }}</h1>
+          <div [innerHTML]="content.content"></div>
+        </article>
+        }
+      </div>
+      <div class="p-4 bg-gray-50 dark:bg-slate-800 border-t dark:border-gray-700 text-right shrink-0">
+        <button (click)="closePreview()"
+          class="px-4 py-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-50 text-sm font-medium rounded-md">Close</button>
       </div>
     </div>
+  </div>
   }
 </main>

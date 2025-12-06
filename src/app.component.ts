@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import { EpubService, EpubGenerationConfig, GenerationProgress, ChapterPreview, Chapter, TestSelectorConfig, DetectedSelectors } from './services/epub.service';
@@ -36,9 +37,9 @@ type AccordionSection = 'general' | 'dataSource' | 'metadata' | 'parsing' | 'cle
   templateUrl: './app.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    ReactiveFormsModule, 
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     SelectorTesterComponent,
     IconBookComponent,
     IconCogComponent,
@@ -56,10 +57,11 @@ type AccordionSection = 'general' | 'dataSource' | 'metadata' | 'parsing' | 'cle
 export class AppComponent {
   private epubService = inject(EpubService);
   private http = inject(HttpClient);
+  private sanitizer = inject(DomSanitizer);
   // FIX: Replaced `inject(FormBuilder)` with direct instantiation. `inject` was failing to resolve the type correctly, causing `this.fb` to be `unknown`.
   private fb = new FormBuilder();
   private generationSubscription: Subscription | null = null;
-  
+
   defaultConfig: EpubGenerationConfig = {
     proxyUrl: 'https://api.allorigins.win/raw?url=',
     tocUrl: '',
@@ -99,7 +101,7 @@ export class AppComponent {
   configForm: FormGroup;
   uiStateForm: FormGroup;
   config = signal<EpubGenerationConfig>(this.defaultConfig);
-  
+
   coverImagePreview = signal<string | null>(null);
 
   appStep = signal<'config' | 'details' | 'chapters' | 'generating' | 'finished'>('config');
@@ -107,15 +109,15 @@ export class AppComponent {
   progress = signal<GenerationProgress>({ message: '', percentage: 0 });
   error = signal<string | null>(null);
   isSideMenuVisible = signal(false);
-  
+
   processedChapters = signal<ProcessedChapter[]>([]);
   selectedChaptersCount = computed(() => this.processedChapters().filter(c => c.selected).length);
   successfulChaptersCount = computed(() => this.processedChapters().filter(c => c.status === 'success').length);
   failedChaptersCount = computed(() => this.processedChapters().filter(c => c.status === 'error').length);
-  
+
   // Chapter Preview State
   previewingChapter = signal<ProcessedChapter | null>(null);
-  previewContent = signal<{ title: string; content: string } | null>(null);
+  previewContent = signal<{ title: string; content: SafeHtml } | null>(null);
   previewError = signal<string | null>(null);
   isFetchingPreview = signal(false);
 
@@ -129,22 +131,22 @@ export class AppComponent {
 
   // Auto-Detect State
   isDetecting = signal(false);
-  detectionStatus = signal<{type: 'success' | 'error', message: string} | null>(null);
+  detectionStatus = signal<{ type: 'success' | 'error', message: string } | null>(null);
 
   // Presets State
-  defaultPresets = signal<{name: string, config: Partial<EpubGenerationConfig>}[]>(INLINED_DEFAULT_PRESETS);
-  userPresets = signal<{name: string, config: EpubGenerationConfig}[]>([]);
+  defaultPresets = signal<{ name: string, config: Partial<EpubGenerationConfig> }[]>(INLINED_DEFAULT_PRESETS);
+  userPresets = signal<{ name: string, config: EpubGenerationConfig }[]>([]);
   presets = computed(() => {
-    const presetMap = new Map<string, {name: string, config: EpubGenerationConfig}>();
+    const presetMap = new Map<string, { name: string, config: EpubGenerationConfig }>();
     const fullDefaultPresets = this.defaultPresets().map(p => ({
-        name: p.name,
-        config: { ...this.defaultConfig, ...p.config }
+      name: p.name,
+      config: { ...this.defaultConfig, ...p.config }
     }));
     fullDefaultPresets.forEach(p => presetMap.set(p.name, p));
     this.userPresets().forEach(p => presetMap.set(p.name, p));
     return Array.from(presetMap.values());
   });
-  
+
   saveButtonText = computed(() => {
     const currentName = this.uiStateForm.get('presetName')?.value;
     if (!currentName) {
@@ -164,7 +166,7 @@ export class AppComponent {
     }
     return this.processedChapters().filter(c => c.title.toLowerCase().includes(filter));
   });
-  
+
   // Stateful Buttons
   savePresetSuccess = signal(false);
   exportSettingsSuccess = signal(false);
@@ -232,7 +234,7 @@ export class AppComponent {
     } else {
       this.isDarkMode.set(window.matchMedia('(prefers-color-scheme: dark)').matches);
     }
-    
+
     // Effect to apply dark mode class and save preference
     effect(() => {
       if (this.isDarkMode()) {
@@ -256,16 +258,16 @@ export class AppComponent {
   get textToRemoveControls() {
     return (this.configForm.get('textToRemove') as FormArray).controls;
   }
-  
+
   loadLastConfig() {
     const lastConfig = localStorage.getItem('epub-gen-last-config');
     if (lastConfig) {
       try {
         const parsedConfig = JSON.parse(lastConfig);
-        
+
         // Backward compatibility for textToRemove
         if (typeof parsedConfig.textToRemove === 'string') {
-            parsedConfig.textToRemove = parsedConfig.textToRemove.split(',').map((s: string) => s.trim()).filter(Boolean);
+          parsedConfig.textToRemove = parsedConfig.textToRemove.split(',').map((s: string) => s.trim()).filter(Boolean);
         }
 
         const configToSet = { ...this.defaultConfig, ...parsedConfig };
@@ -276,7 +278,7 @@ export class AppComponent {
         const textToRemoveArray = this.configForm.get('textToRemove') as FormArray;
         textToRemoveArray.clear();
         (configToSet.textToRemove || []).forEach((phrase: string) => {
-            textToRemoveArray.push(this.fb.control(phrase));
+          textToRemoveArray.push(this.fb.control(phrase));
         });
 
       } catch (e) {
@@ -289,7 +291,7 @@ export class AppComponent {
 
   loadUserPresets() {
     const savedPresets = localStorage.getItem('epub-gen-presets');
-    const userPresetsFromStorage: {name: string, config: EpubGenerationConfig}[] = savedPresets ? JSON.parse(savedPresets) : [];
+    const userPresetsFromStorage: { name: string, config: EpubGenerationConfig }[] = savedPresets ? JSON.parse(savedPresets) : [];
     this.userPresets.set(userPresetsFromStorage);
   }
 
@@ -307,18 +309,18 @@ export class AppComponent {
     const newPreset = { name: presetName, config: this.config() };
     const currentUserPresets = this.userPresets();
     const existingIndex = currentUserPresets.findIndex(p => p.name === presetName);
-    
+
     let updatedUserPresets;
     if (existingIndex !== -1) {
-       updatedUserPresets = currentUserPresets.map((p, i) => i === existingIndex ? newPreset : p);
+      updatedUserPresets = currentUserPresets.map((p, i) => i === existingIndex ? newPreset : p);
     } else {
-       updatedUserPresets = [...currentUserPresets, newPreset];
+      updatedUserPresets = [...currentUserPresets, newPreset];
     }
-    
+
     localStorage.setItem('epub-gen-presets', JSON.stringify(updatedUserPresets));
     this.userPresets.set(updatedUserPresets);
     this.uiStateForm.get('presetName')?.setValue('');
-    
+
     this.savePresetSuccess.set(true);
     setTimeout(() => this.savePresetSuccess.set(false), 2000);
   }
@@ -333,15 +335,15 @@ export class AppComponent {
       if (typeof presetConfig.textToRemove === 'string') {
         (presetConfig as any).textToRemove = (presetConfig.textToRemove as string).split(',').map((s: string) => s.trim()).filter(Boolean);
       }
-      
+
       const configToSet = { ...this.defaultConfig, ...presetConfig, proxyUrl: currentProxy };
       this.config.set(configToSet);
-      
+
       this.configForm.patchValue(configToSet, { emitEvent: false });
       const textToRemoveArray = this.configForm.get('textToRemove') as FormArray;
       textToRemoveArray.clear();
       (configToSet.textToRemove || []).forEach((phrase: string) => {
-          textToRemoveArray.push(this.fb.control(phrase));
+        textToRemoveArray.push(this.fb.control(phrase));
       });
       this.configForm.updateValueAndValidity(); // Manually trigger update
 
@@ -358,7 +360,7 @@ export class AppComponent {
     const textToRemoveArray = this.configForm.get('textToRemove') as FormArray;
     textToRemoveArray.clear();
     (configToSet.textToRemove || []).forEach((phrase: string) => {
-        textToRemoveArray.push(this.fb.control(phrase));
+      textToRemoveArray.push(this.fb.control(phrase));
     });
     this.configForm.updateValueAndValidity(); // Manually trigger update
   }
@@ -366,13 +368,13 @@ export class AppComponent {
   deleteSelectedPreset() {
     const presetToDelete = this.uiStateForm.get('selectedPreset')?.value;
     if (!presetToDelete || this.isDefaultPreset(presetToDelete)) return;
-    
+
     const updatedUserPresets = this.userPresets().filter(preset => preset.name !== presetToDelete);
     localStorage.setItem('epub-gen-presets', JSON.stringify(updatedUserPresets));
     this.userPresets.set(updatedUserPresets);
     this.uiStateForm.get('selectedPreset')?.setValue('');
   }
-  
+
   isDefaultPreset(name: string): boolean {
     return this.defaultPresets().some(p => p.name === name);
   }
@@ -381,7 +383,7 @@ export class AppComponent {
     const blob = new Blob([JSON.stringify(this.config(), null, 2)], { type: 'application/json' });
     const filename = `epub-generator-settings-${this.config().novelTitle.replace(/\s/g, '_') || 'export'}.json`;
     saveAs(blob, filename);
-    
+
     this.exportSettingsSuccess.set(true);
     setTimeout(() => this.exportSettingsSuccess.set(false), 2000);
   }
@@ -394,9 +396,9 @@ export class AppComponent {
     reader.onload = () => {
       try {
         const importedConfig = JSON.parse(reader.result as string);
-        
+
         if (typeof importedConfig.textToRemove === 'string') {
-            importedConfig.textToRemove = importedConfig.textToRemove.split(',').map((s: string) => s.trim()).filter(Boolean);
+          importedConfig.textToRemove = importedConfig.textToRemove.split(',').map((s: string) => s.trim()).filter(Boolean);
         }
 
         const configToSet = { ...this.defaultConfig, ...importedConfig };
@@ -406,7 +408,7 @@ export class AppComponent {
         const textToRemoveArray = this.configForm.get('textToRemove') as FormArray;
         textToRemoveArray.clear();
         (configToSet.textToRemove || []).forEach((phrase: string) => {
-            textToRemoveArray.push(this.fb.control(phrase));
+          textToRemoveArray.push(this.fb.control(phrase));
         });
         this.configForm.updateValueAndValidity();
 
@@ -446,8 +448,8 @@ export class AppComponent {
 
     const minIndex = Math.min(startIndex, endIndex);
     const maxIndex = Math.max(startIndex, endIndex);
-    
-    this.processedChapters.update(chaps => 
+
+    this.processedChapters.update(chaps =>
       chaps.map((c, index) => ({
         ...c,
         selected: index >= minIndex && index <= maxIndex
@@ -491,13 +493,13 @@ export class AppComponent {
             author: details.author || this.config().author,
             synopsis: details.synopsis || this.config().synopsis,
           };
-          
+
           if (details.scrapedCoverUrl && !this.config().coverImageBase64) {
-             updates.coverImageUrl = details.scrapedCoverUrl;
+            updates.coverImageUrl = details.scrapedCoverUrl;
           }
 
           this.configForm.patchValue(updates);
-          this.processedChapters.set(chapters.map(c => ({...c, selected: true, status: 'pending'})));
+          this.processedChapters.set(chapters.map(c => ({ ...c, selected: true, status: 'pending' })));
           this.appStep.set('details');
         },
         error: (err) => this.error.set(err.message || 'An unknown error occurred while fetching chapters.')
@@ -505,7 +507,7 @@ export class AppComponent {
   }
 
   startOrRetryGeneration(retryFailed = false) {
-    const chaptersToProcess = this.processedChapters().filter(c => 
+    const chaptersToProcess = this.processedChapters().filter(c =>
       c.selected && (retryFailed ? c.status === 'error' : true)
     );
 
@@ -513,7 +515,7 @@ export class AppComponent {
       this.error.set(retryFailed ? 'No failed chapters to retry.' : 'No chapters selected.');
       return;
     }
-    
+
     // Reset status for the chapters we are about to process
     this.processedChapters.update(allChapters => allChapters.map(c => {
       if (chaptersToProcess.some(p => p.id === c.id)) {
@@ -529,7 +531,7 @@ export class AppComponent {
     this.generationSubscription = this.epubService.fetchAllChapters(chaptersToProcess, this.processedChapters(), this.config())
       .subscribe({
         next: (processedChapter: Chapter & { status: ChapterStatus; error?: string }) => {
-          this.processedChapters.update(allChapters => allChapters.map(c => 
+          this.processedChapters.update(allChapters => allChapters.map(c =>
             c.id === processedChapter.id ? { ...c, ...processedChapter } : c
           ));
           const totalSelected = this.selectedChaptersCount();
@@ -552,9 +554,9 @@ export class AppComponent {
     this.isLoading.set(true);
     this.error.set(null);
     this.progress.set({ message: 'Building EPUB file...', percentage: 0 });
-    
+
     const successfulChapters = this.processedChapters().filter(c => c.status === 'success') as Chapter[];
-    
+
     this.epubService.buildAndZipEpub(successfulChapters, this.config())
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
@@ -577,7 +579,7 @@ export class AppComponent {
     const filename = `${this.config().novelTitle.replace(/ /g, '_')}.txt`;
     saveAs(blob, filename);
   }
-  
+
   cancelGeneration() {
     if (this.generationSubscription) {
       this.generationSubscription.unsubscribe();
@@ -611,7 +613,10 @@ export class AppComponent {
     this.epubService.fetchAndCleanChapter(testChapter, this.config())
       .pipe(finalize(() => this.isFetchingPreview.set(false)))
       .subscribe({
-        next: (data) => this.previewContent.set(data),
+        next: (data) => this.previewContent.set({
+          title: data.title,
+          content: this.sanitizer.bypassSecurityTrustHtml(data.content)
+        }),
         error: (err) => this.previewError.set(err.message || 'Failed to fetch or parse chapter for preview.')
       });
   }
@@ -628,7 +633,10 @@ export class AppComponent {
     this.epubService.fetchAndCleanChapter(chapter, this.config(), this.processedChapters())
       .pipe(finalize(() => this.isFetchingPreview.set(false)))
       .subscribe({
-        next: (data) => this.previewContent.set(data),
+        next: (data) => this.previewContent.set({
+          title: data.title,
+          content: this.sanitizer.bypassSecurityTrustHtml(data.content)
+        }),
         error: (err) => this.previewError.set(err.message || 'Failed to fetch or parse chapter for preview.')
       });
   }
@@ -636,11 +644,11 @@ export class AppComponent {
   closePreview() {
     this.previewingChapter.set(null);
   }
-  
+
   testSelector(selectorKey: keyof EpubGenerationConfig, title: string) {
     this.selectorTestStates.update(states => ({
-        ...states,
-        [selectorKey]: { isLoading: true, error: null, result: null, title }
+      ...states,
+      [selectorKey]: { isLoading: true, error: null, result: null, title }
     }));
 
     const currentConfig = this.config();
@@ -649,95 +657,95 @@ export class AppComponent {
     let testConfig: Omit<TestSelectorConfig, 'proxyUrl'> | null = null;
     const tocUrl = currentConfig.tocUrl;
     const firstChapterUrl = currentConfig.firstChapterUrl;
-    
+
     const setError = (message: string) => {
-        this.selectorTestStates.update(states => ({
-            ...states,
-            [selectorKey]: { ...states[selectorKey], isLoading: false, error: message }
-        }));
+      this.selectorTestStates.update(states => ({
+        ...states,
+        [selectorKey]: { ...states[selectorKey], isLoading: false, error: message }
+      }));
     };
 
     switch (selectorKey) {
-        case 'novelTitleSelector':
-        case 'authorSelector':
-        case 'synopsisSelector':
-            if (!tocUrl) { setError('Table of Contents URL is required.'); return; }
-            testConfig = { url: tocUrl, selector, returnType: 'text', multi: false };
-            break;
-        case 'coverImageSelector':
-            if (!tocUrl) { setError('Table of Contents URL is required.'); return; }
-            testConfig = { url: tocUrl, selector, returnType: 'attribute', attribute: 'src', multi: false };
-            break;
-        case 'tocLinkSelector':
-            if (!tocUrl) { setError('Table of Contents URL is required.'); return; }
-            testConfig = { url: tocUrl, selector, returnType: 'text', multi: true };
-            break;
-        case 'chapterTitleSelector':
-        case 'nextPageLinkSelector':
-        case 'chapterContainerSelector':
-             if (!firstChapterUrl) { setError('First Chapter URL is required.'); return; }
-             if (selectorKey === 'chapterContainerSelector') {
-                 testConfig = { url: firstChapterUrl, selector, returnType: 'html', multi: false };
-             } else if (selectorKey === 'nextPageLinkSelector') {
-                 testConfig = { url: firstChapterUrl, selector, returnType: 'attribute', attribute: 'href', multi: false };
-             } else {
-                 testConfig = { url: firstChapterUrl, selector, returnType: 'text', multi: false };
-             }
-             break;
+      case 'novelTitleSelector':
+      case 'authorSelector':
+      case 'synopsisSelector':
+        if (!tocUrl) { setError('Table of Contents URL is required.'); return; }
+        testConfig = { url: tocUrl, selector, returnType: 'text', multi: false };
+        break;
+      case 'coverImageSelector':
+        if (!tocUrl) { setError('Table of Contents URL is required.'); return; }
+        testConfig = { url: tocUrl, selector, returnType: 'attribute', attribute: 'src', multi: false };
+        break;
+      case 'tocLinkSelector':
+        if (!tocUrl) { setError('Table of Contents URL is required.'); return; }
+        testConfig = { url: tocUrl, selector, returnType: 'text', multi: true };
+        break;
+      case 'chapterTitleSelector':
+      case 'nextPageLinkSelector':
+      case 'chapterContainerSelector':
+        if (!firstChapterUrl) { setError('First Chapter URL is required.'); return; }
+        if (selectorKey === 'chapterContainerSelector') {
+          testConfig = { url: firstChapterUrl, selector, returnType: 'html', multi: false };
+        } else if (selectorKey === 'nextPageLinkSelector') {
+          testConfig = { url: firstChapterUrl, selector, returnType: 'attribute', attribute: 'href', multi: false };
+        } else {
+          testConfig = { url: firstChapterUrl, selector, returnType: 'text', multi: false };
+        }
+        break;
     }
 
     if (!testConfig || !selector) {
-        setError(selector ? 'This selector cannot be tested.' : 'Selector is empty.');
-        return;
+      setError(selector ? 'This selector cannot be tested.' : 'Selector is empty.');
+      return;
     }
 
     const fullTestConfig: TestSelectorConfig = {
-        ...testConfig,
-        proxyUrl: currentConfig.proxyUrl
+      ...testConfig,
+      proxyUrl: currentConfig.proxyUrl
     };
 
     this.epubService.testSelector(fullTestConfig)
-        .pipe(finalize(() => {
-             this.selectorTestStates.update(states => ({
-                ...states,
-                [selectorKey]: { ...states[selectorKey], isLoading: false }
-            }));
-        }))
-        .subscribe({
-            next: (data) => {
-                 this.selectorTestStates.update(states => ({
-                    ...states,
-                    [selectorKey]: { ...states[selectorKey], result: data.result }
-                }));
-            },
-            error: (err) => {
-                this.selectorTestStates.update(states => ({
-                    ...states,
-                    [selectorKey]: { ...states[selectorKey], error: err.message }
-                }));
-            }
-        });
+      .pipe(finalize(() => {
+        this.selectorTestStates.update(states => ({
+          ...states,
+          [selectorKey]: { ...states[selectorKey], isLoading: false }
+        }));
+      }))
+      .subscribe({
+        next: (data) => {
+          this.selectorTestStates.update(states => ({
+            ...states,
+            [selectorKey]: { ...states[selectorKey], result: data.result }
+          }));
+        },
+        error: (err) => {
+          this.selectorTestStates.update(states => ({
+            ...states,
+            [selectorKey]: { ...states[selectorKey], error: err.message }
+          }));
+        }
+      });
   }
-  
+
   onCoverFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const base64 = e.target?.result as string;
-            this.coverImagePreview.set(base64);
-            this.configForm.patchValue({ coverImageBase64: base64, coverImageUrl: '' });
-        };
-        reader.readAsDataURL(file);
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        this.coverImagePreview.set(base64);
+        this.configForm.patchValue({ coverImageBase64: base64, coverImageUrl: '' });
+      };
+      reader.readAsDataURL(file);
     }
   }
 
   clearCoverImage(): void {
     this.coverImagePreview.set(null);
-    this.configForm.patchValue({ coverImageBase64: '', coverImageUrl: 'https://picsum.photos/600/800'});
+    this.configForm.patchValue({ coverImageBase64: '', coverImageUrl: 'https://picsum.photos/600/800' });
     const fileInput = document.getElementById('coverImageFile') as HTMLInputElement;
-    if(fileInput) fileInput.value = '';
+    if (fileInput) fileInput.value = '';
   }
 
   addTextToRemove() {
@@ -759,7 +767,7 @@ export class AppComponent {
   toggleSideMenu() {
     this.isSideMenuVisible.update(v => !v);
   }
-  
+
   toggleProxy() {
     const proxyControl = this.configForm.get('proxyUrl');
     if (proxyControl) {
@@ -782,7 +790,7 @@ export class AppComponent {
   }
 
   toggleAllChapters(select: boolean) {
-    this.processedChapters.update(chapters => 
+    this.processedChapters.update(chapters =>
       chapters.map(c => ({ ...c, selected: select }))
     );
   }
@@ -806,7 +814,7 @@ export class AppComponent {
       chapters.map(c => c.id === chapterId ? { ...c, selected: !c.selected } : c)
     );
   }
-  
+
   // Drag and Drop Handlers
   onDragStart(event: DragEvent, chapterId: string): void {
     this.draggedChapterId.set(chapterId);
@@ -831,11 +839,11 @@ export class AppComponent {
       const draggedIndex = chapters.findIndex(c => c.id === draggedId);
       const targetIndex = chapters.findIndex(c => c.id === targetChapterId);
       if (draggedIndex === -1 || targetIndex === -1) return chapters;
-      
+
       const newChapters = [...chapters];
       const [draggedItem] = newChapters.splice(draggedIndex, 1);
       newChapters.splice(targetIndex, 0, draggedItem);
-      
+
       // Re-assign order based on new position
       return newChapters.map((c, index) => ({ ...c, order: index + 1 }));
     });
@@ -853,7 +861,7 @@ export class AppComponent {
     this.processedChapters.set([]);
     this.error.set(null);
   }
-  
+
   goToChapters() {
     this.appStep.set('chapters');
   }
@@ -862,7 +870,7 @@ export class AppComponent {
     this.appStep.set('details');
     this.error.set(null);
   }
-  
+
   goBackToChapters() {
     this.appStep.set('chapters');
     this.error.set(null);
